@@ -16,7 +16,7 @@ def download_image(keyword, download_num, dirname, minsize):
         count += 1
         url = 'http://image.search.yahoo.co.jp/search?p={0}&ktot=30&dtot=0&ei=UTF-8&xargs={1}&b={2}'.format(urllib.request.quote(keyword), count, ONE_PAGE_NUM * count + 1)
         num += crawring(url, extensions, dirname, download_num - num, minsize)
-        if download_num * 2 < count * ONE_PAGE_NUM:
+        if download_num * 3 < count * ONE_PAGE_NUM:
             break
 
 def crawring(url, extensions, dirname, download_num, minsize):
