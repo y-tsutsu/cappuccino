@@ -1,8 +1,8 @@
-import sys, os
+import sys, os, random
 from downloader import download_image
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QHBoxLayout
 from PyQt5.QtGui import QPixmap, QPainter, QImage, QTransform
-from PyQt5.QtCore import Qt, QMargins, QRectF
+from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer
 
 dirname  = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'image')
 
@@ -14,18 +14,20 @@ def download():
 class ImageView(QGraphicsView):
     def __init__(self, parent = None):
         super(ImageView, self).__init__(parent)
+        self.__image = None
         self.init_ui()
 
     def init_ui(self):
-        self.__image = None
         self.setCacheMode(QGraphicsView.CacheBackground)
         self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform | QPainter.TextAntialiasing)
 
     def set_image(self, filename):
         self.__image = QImage(filename)
-        print(self.__image.width(), self.__image.height())
+        print('#####')
+        self.update(self.rect())
 
     def paintEvent(self, event):
+        print('*****')
         if not self.__image:
             return
 
@@ -40,24 +42,47 @@ class ImageView(QGraphicsView):
 
         painter = QPainter(self.viewport())
         painter.drawImage(rect, self.__image)
+        painter.end()
+
+        super(ImageView, self).paintEvent(event)
 
 class MainWindow(QWidget):
     def __init__(self, parent = None):
         super(MainWindow, self).__init__(parent, Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
+        self.__view = ImageView(self)
+        self.__timer = QTimer(self)
+        self.__image_list = None
         self.init_ui()
 
     def init_ui(self):
-        view = ImageView(self)
-        view.set_image(os.path.join(dirname, 'iwate1-3.jpg'))
+        self.__timer.setInterval(1000)
+        self.__timer.timeout.connect(self.on_timeout)
 
-        hbox = QHBoxLayout()
-        hbox.addWidget(view)
+        hbox = QHBoxLayout(self)
+        hbox.addWidget(self.__view)
         hbox.setContentsMargins(QMargins(0, 0, 0, 0))
-
         self.setLayout(hbox)
 
         self.resize(500, 300)
         self.setWindowTitle("cappuccino")
+
+        self.init_image_list()
+        self.__timer.start()
+
+    def init_image_list(self):
+        self.__image_list = [x for x in os.listdir(dirname) if os.path.isfile(os.path.join(dirname, x))]
+
+    def random_set_image(self):
+        image = random.choice(self.__image_list)
+        self.__image_list.remove(image)
+        self.__view.set_image(os.path.join(dirname, image))
+
+    def on_timeout(self):
+        if not self.__image_list:
+            return 
+        if len(self.__image_list) == 0:
+            self.init_image_list()
+        self.random_set_image()
 
 def main():
     app = QApplication(sys.argv)
