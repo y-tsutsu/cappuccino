@@ -79,8 +79,6 @@ class MainWindow(QWidget):
 
     def on_timeout(self):
         if not self.__image_list:
-            return 
-        if len(self.__image_list) == 0:
             self.init_image_list()
         self.random_set_image()
 
