@@ -2,7 +2,7 @@ import sys, os, random
 from downloader import download_image
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QHBoxLayout
 from PyQt5.QtGui import QPixmap, QPainter, QImage, QTransform
-from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer
+from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize
 
 dirname  = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'image')
 
@@ -23,11 +23,11 @@ class ImageView(QGraphicsView):
 
     def set_image(self, filename):
         self.__image = QImage(filename)
-        print('#####')
-        self.update(self.rect())
+        self.setUpdatesEnabled(False)   # ステータスを書き換えないとrepaint()が効かなかった対策．もっとまともな手はないか．．．
+        self.setUpdatesEnabled(True)
+        self.repaint()
 
     def paintEvent(self, event):
-        print('*****')
         if not self.__image:
             return
 
