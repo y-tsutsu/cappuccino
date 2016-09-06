@@ -1,8 +1,8 @@
 import sys, os
 from downloader import download_image
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QHBoxLayout
-from PyQt5.QtGui import QPixmap, QPainter, QImage
-from PyQt5.QtCore import Qt, QMargins
+from PyQt5.QtGui import QPixmap, QPainter, QImage, QTransform
+from PyQt5.QtCore import Qt, QMargins, QRectF
 
 dirname  = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'image')
 
@@ -21,15 +21,25 @@ class ImageView(QGraphicsView):
         self.setCacheMode(QGraphicsView.CacheBackground)
         self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform | QPainter.TextAntialiasing)
 
+    def set_image(self, filename):
+        self.__image = QImage(filename)
+        print(self.__image.width(), self.__image.height())
+
     def paintEvent(self, event):
         if not self.__image:
             return
-        painter = QPainter(self.viewport())
-        rect = self.rect()
-        painter.drawImage(rect, self.__image)
 
-    def set_image(self, filename):
-        self.__image = QImage(filename)
+        image_aspect_ratio = self.__image.width() / self.__image.height()
+        view_aspect_ratio = self.width() / self.height()
+        if view_aspect_ratio <= image_aspect_ratio:
+            image_height = self.width() / image_aspect_ratio
+            rect = QRectF(0, (self.height() - image_height) / 2, self.width(), image_height)
+        else:
+            image_widh = self.height() * image_aspect_ratio
+            rect = QRectF((self.width() - image_widh) / 2, 0, image_widh, self.height())
+
+        painter = QPainter(self.viewport())
+        painter.drawImage(rect, self.__image)
 
 class MainWindow(QWidget):
     def __init__(self, parent = None):
@@ -38,7 +48,7 @@ class MainWindow(QWidget):
 
     def init_ui(self):
         view = ImageView(self)
-        view.set_image(os.path.join(dirname, 'img21.jpg'))
+        view.set_image(os.path.join(dirname, 'iwate1-3.jpg'))
 
         hbox = QHBoxLayout()
         hbox.addWidget(view)
@@ -46,7 +56,7 @@ class MainWindow(QWidget):
 
         self.setLayout(hbox)
 
-        self.resize(500, 500)
+        self.resize(500, 300)
         self.setWindowTitle("cappuccino")
 
 def main():
