@@ -1,13 +1,13 @@
 import sys, os, random
 from downloader import download_image
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QHBoxLayout
-from PyQt5.QtGui import QPixmap, QPainter, QImage, QTransform
+from PyQt5.QtGui import QPixmap, QPainter, QImage
 from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize, QPoint, pyqtSignal
 
 dirname  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
 
 def download():
-    keyword = '美女'
+    keyword = '美人'
     minsize = (500, 500)
     download_image(keyword, 100, dirname, minsize)
 
