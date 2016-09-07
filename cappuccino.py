@@ -31,6 +31,9 @@ class ImageView(QGraphicsView):
         if not self.__image:
             return
 
+        if self.__image.height() == 0 or self.height() == 0 or self.__image.width() == 0:
+            return
+
         image_aspect_ratio = self.__image.width() / self.__image.height()
         view_aspect_ratio = self.width() / self.height()
         if view_aspect_ratio <= image_aspect_ratio:
