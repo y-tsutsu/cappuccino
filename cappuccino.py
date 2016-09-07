@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QHBoxLayout
 from PyQt5.QtGui import QPixmap, QPainter, QImage, QTransform
 from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize
 
-dirname  = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'image')
+dirname  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
 
 def download():
     keyword = '美女'
