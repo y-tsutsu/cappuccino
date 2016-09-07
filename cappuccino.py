@@ -84,7 +84,7 @@ class MainWindow(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.__timer.setInterval(1000)
+        self.__timer.setInterval(20000)
         self.__timer.timeout.connect(self.on_timeout)
 
         hbox = QHBoxLayout(self)
