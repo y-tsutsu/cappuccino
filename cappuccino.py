@@ -10,7 +10,7 @@ DOUNLOAD_COUNT = 100
 
 IMAGE_INTERVAL = 20000
 
-DEFAULT_KEYWORD = 'ねこ'
+DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
 class ImageView(QGraphicsView):
     mouse_left_press = pyqtSignal(QPoint)
