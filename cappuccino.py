@@ -1,7 +1,7 @@
 import sys, os, random, threading
 from downloader import Downloader
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QHBoxLayout, QVBoxLayout, QLabel, QProgressBar
-from PyQt5.QtGui import QPixmap, QPainter, QImage
+from PyQt5.QtGui import QPixmap, QPainter, QImage, QMouseEvent
 from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize, QPoint, pyqtSignal
 
 DIR_NAME  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
@@ -16,6 +16,7 @@ class ImageView(QGraphicsView):
     mouse_left_press = pyqtSignal(QPoint)
     mouse_left_move = pyqtSignal(QPoint)
     mouse_left_release = pyqtSignal(QPoint)
+    mouse_double_click = pyqtSignal(QMouseEvent)
 
     def __init__(self, parent = None):
         super(ImageView, self).__init__(parent)
@@ -59,21 +60,28 @@ class ImageView(QGraphicsView):
         super(ImageView, self).paintEvent(event)
 
     def mousePressEvent(self, event):
+        super(ImageView, self).mousePressEvent(event)
         if (event.button() == Qt.LeftButton):
             self.__is_mouse_left_press = True
             pos = self.point_to_parent(event.pos())
             self.mouse_left_press.emit(pos)
 
     def mouseMoveEvent(self, event):
+        super(ImageView, self).mouseMoveEvent(event)
         if (self.__is_mouse_left_press):
             pos = self.point_to_parent(event.pos())
             self.mouse_left_move.emit(pos)
 
     def mouseReleaseEvent(self, event):
+        super(ImageView, self).mouseReleaseEvent(event)
         if (event.button() == Qt.LeftButton):
             self.__is_mouse_left_press = False
             pos = self.point_to_parent(event.pos())
             self.mouse_left_release.emit(pos)
+
+    def mouseDoubleClickEvent(self, event):
+        super(ImageView, self).mouseDoubleClickEvent(event)
+        self.mouse_double_click.emit(event)
 
 class MainWindow(QWidget):
     complete_progress = pyqtSignal()
@@ -141,6 +149,7 @@ class MainWindow(QWidget):
         self.__view.mouse_left_press.connect(self.on_view_mouse_left_press)
         self.__view.mouse_left_move.connect(self.on_view_mouse_left_move)
         self.__view.mouse_left_release.connect(self.on_view_mouse_left_release)
+        self.__view.mouse_double_click.connect(self.on_view_mouse_double_click)
 
         self.__timer = QTimer(self)
         self.__timer.setInterval(IMAGE_INTERVAL)
@@ -192,6 +201,7 @@ class MainWindow(QWidget):
 
     def on_view_mouse_left_press(self, pos):
         self.__mouse_left_press_pos = pos
+        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
     def on_view_mouse_left_move(self, pos):
         if not self.__mouse_left_press_pos:
@@ -202,16 +212,26 @@ class MainWindow(QWidget):
     def on_view_mouse_left_release(self, pos):
         self.__mouse_left_press_pos = None
 
+    def on_view_mouse_double_click(self, event):
+        self.setWindowState(Qt.WindowMinimized)
+
     def mousePressEvent(self, event):
+        super(MainWindow, self).mousePressEvent(event)
         if (event.button() == Qt.LeftButton):
             self.on_view_mouse_left_press(event.pos())
 
     def mouseMoveEvent(self, event):
+        super(MainWindow, self).mouseMoveEvent(event)
         self.on_view_mouse_left_move(event.pos())
 
     def mouseReleaseEvent(self, event):
+        super(MainWindow, self).mouseReleaseEvent(event)
         if (event.button() == Qt.LeftButton):
             self.on_view_mouse_left_release(event.pos())
+
+    def mouseDoubleClickEvent(self, event):
+        super(MainWindow, self).mouseDoubleClickEvent(event)
+        self.on_view_mouse_double_click(event)
 
 def main():
     app = QApplication(sys.argv)
