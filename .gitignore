@@ -30,3 +30,6 @@ _ReSharper*/
 env
 __pycache__
 image/
+build/
+dist/
+*.spec

@@ -10,6 +10,8 @@ DOUNLOAD_COUNT = 100
 
 IMAGE_INTERVAL = 20000
 
+DEFAULT_KEYWORD = 'ねこ'
+
 class ImageView(QGraphicsView):
     mouse_left_press = pyqtSignal(QPoint)
     mouse_left_move = pyqtSignal(QPoint)
@@ -214,6 +216,9 @@ class MainWindow(QWidget):
 def main():
     app = QApplication(sys.argv)
     download_keyword = sys.argv[1] if (2 <= len(sys.argv)) else ''
+    if not download_keyword and not os.path.isdir(DIR_NAME):
+        download_keyword = DEFAULT_KEYWORD
+
     window = MainWindow(download_keyword)
     window.show()
     sys.exit(app.exec_())
