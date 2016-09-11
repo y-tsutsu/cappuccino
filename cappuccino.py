@@ -1,15 +1,14 @@
-import sys, os, random
-from downloader import download_image
-from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QHBoxLayout
+import sys, os, random, threading
+from downloader import Downloader
+from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QHBoxLayout, QVBoxLayout, QLabel, QProgressBar
 from PyQt5.QtGui import QPixmap, QPainter, QImage
 from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize, QPoint, pyqtSignal
 
-dirname  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
+DIR_NAME  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
 
-def download():
-    keyword = '美人'
-    minsize = (500, 500)
-    download_image(keyword, 100, dirname, minsize)
+DOUNLOAD_COUNT = 100
+
+IMAGE_INTERVAL = 20000
 
 class ImageView(QGraphicsView):
     mouse_left_press = pyqtSignal(QPoint)
@@ -75,49 +74,119 @@ class ImageView(QGraphicsView):
             self.mouse_left_release.emit(pos)
 
 class MainWindow(QWidget):
-    def __init__(self, parent = None):
+    complete_progress = pyqtSignal()
+
+    def __init__(self, download_keyword, parent = None):
         super(MainWindow, self).__init__(parent, Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
-        self.__view = ImageView(self)
-        self.__timer = QTimer(self)
+        self.__download_keyword = download_keyword
+        self.complete_progress.connect(self.on_complete_progress)
+
+        # download
+        self.__download_label = None
+        self.__downloader = None
+        self.__progress_bar = None
+
+        # image
+        self.__view = None
+        self.__timer = None
         self.__image_list = None
         self.__mouse_left_press_pos = None
-        self.init_ui()
 
-    def init_ui(self):
-        self.__timer.setInterval(20000)
-        self.__timer.timeout.connect(self.on_timeout)
+        if self.__download_keyword:
+            self.init_download_ui()
+        else:
+            self.init_image_ui()
 
-        hbox = QHBoxLayout(self)
-        hbox.addWidget(self.__view)
-        hbox.setContentsMargins(QMargins(0, 0, 0, 0))
-        self.setLayout(hbox)
+        self.start()
 
+    def init_common_ui(self):
         self.resize(500, 300)
         self.setWindowTitle("cappuccino")
+
+        if not self.layout():
+            vbox = QVBoxLayout(self)
+            self.setLayout(vbox)
+
+    def init_download_ui(self):
+        self.init_common_ui()
+
+        self.__download_label = QLabel('カプチーノを入れています．．．', self)
+        self.__download_label.setAlignment(Qt.AlignCenter)
+
+        self.__progress_bar = QProgressBar(self)
+        self.__progress_bar.setRange(0, DOUNLOAD_COUNT)
+        self.__progress_bar.setTextVisible(False)
+
+        layout = self.layout()
+        layout.addWidget(self.__download_label)
+        layout.addWidget(self.__progress_bar)
+        layout.setContentsMargins(QMargins(16, 16, 16, 16))
+
+        self.__downloader = Downloader()
+        self.__downloader.progress_download.connect(self.on_progress_download)
+
+    def init_image_ui(self):
+        self.init_common_ui()
+
+        self.__view = ImageView(self)
+
+        layout = self.layout()
+        layout.removeWidget(self.__download_label)
+        layout.removeWidget(self.__progress_bar)
+        layout.addWidget(self.__view)
+        layout.setContentsMargins(QMargins(0, 0, 0, 0))
 
         self.__view.mouse_left_press.connect(self.on_view_mouse_left_press)
         self.__view.mouse_left_move.connect(self.on_view_mouse_left_move)
         self.__view.mouse_left_release.connect(self.on_view_mouse_left_release)
 
-        self.init_image_list()
-        self.random_set_image()
-        self.__timer.start()
+        self.__timer = QTimer(self)
+        self.__timer.setInterval(IMAGE_INTERVAL)
+        self.__timer.timeout.connect(self.on_timeout)
 
     def init_image_list(self):
-        self.__image_list = [x for x in os.listdir(dirname) if os.path.isfile(os.path.join(dirname, x))]
+        self.__image_list = [x for x in os.listdir(DIR_NAME) if os.path.isfile(os.path.join(DIR_NAME, x))]
+
+    def start(self):
+        if self.__download_keyword:
+            th = threading.Thread(target = self.download, args = (self.__download_keyword, ))
+            th.start()
+        else:
+            self.init_image_list()
+            self.random_set_image()
+            self.__timer.start()
+
+    # ダウンロード関連
+
+    def download(self, keyword):
+        minsize = (300, 300)
+        self.__downloader.download_image(keyword, DOUNLOAD_COUNT, DIR_NAME, minsize)
+        self.complete_progress.emit()
+
+    def on_progress_download(self, progress):
+        self.__progress_bar.setValue(progress)
+
+    def on_complete_progress(self):
+        self.__download_keyword = ''
+        self.init_image_ui()
+        self.start()
+
+    # 表示関連
 
     def random_set_image(self):
         image = random.choice(self.__image_list)
         self.__image_list.remove(image)
-        self.__view.set_image(os.path.join(dirname, image))
-
-    def point_to_screen(self, pos):
-        return QPoint(self.x() + pos.x(), self.y() + pos.y())
+        self.__view.set_image(os.path.join(DIR_NAME, image))
 
     def on_timeout(self):
         if not self.__image_list:
             self.init_image_list()
         self.random_set_image()
+
+    # ウィンドウ移動関連
+
+    def point_to_screen(self, pos):
+        return QPoint(self.x() + pos.x(), self.y() + pos.y())
 
     def on_view_mouse_left_press(self, pos):
         self.__mouse_left_press_pos = pos
@@ -131,9 +200,21 @@ class MainWindow(QWidget):
     def on_view_mouse_left_release(self, pos):
         self.__mouse_left_press_pos = None
 
+    def mousePressEvent(self, event):
+        if (event.button() == Qt.LeftButton):
+            self.on_view_mouse_left_press(event.pos())
+
+    def mouseMoveEvent(self, event):
+        self.on_view_mouse_left_move(event.pos())
+
+    def mouseReleaseEvent(self, event):
+        if (event.button() == Qt.LeftButton):
+            self.on_view_mouse_left_release(event.pos())
+
 def main():
     app = QApplication(sys.argv)
-    window = MainWindow()
+    download_keyword = sys.argv[1] if (2 <= len(sys.argv)) else ''
+    window = MainWindow(download_keyword)
     window.show()
     sys.exit(app.exec_())
 
