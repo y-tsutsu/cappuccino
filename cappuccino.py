@@ -125,6 +125,8 @@ class ImageView(QGraphicsView, MouseEventMixin):
         self.repaint()
 
     def random_set_image(self):
+        if not self.__image_list:
+            return
         image = random.choice(self.__image_list)
         self.__image_list.remove(image)
         self.set_image(os.path.join(DIR_NAME, image))
