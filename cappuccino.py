@@ -12,17 +12,40 @@ IMAGE_INTERVAL = 20000
 
 DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
-class DownloadWidget(QWidget):
+class MouseEventMixin():
     mouse_left_press = pyqtSignal(QPoint)
     mouse_left_move = pyqtSignal(QPoint)
     mouse_left_release = pyqtSignal(QPoint)
     mouse_left_double_click = pyqtSignal(QMouseEvent)
+
+    def point_to_parent(self, pos):
+        return QPoint(self.x() + pos.x(), self.y() + pos.y())
+
+    def mouse_press_event(self, event):
+        if (event.button() == Qt.LeftButton):
+            pos = self.point_to_parent(event.pos())
+            self.mouse_left_press.emit(pos)
+
+    def mouse_move_event(self, event):
+        if (event.buttons() & Qt.LeftButton):
+            pos = self.point_to_parent(event.pos())
+            self.mouse_left_move.emit(pos)
+
+    def mouse_release_event(self, event):
+        if (event.button() == Qt.LeftButton):
+            pos = self.point_to_parent(event.pos())
+            self.mouse_left_release.emit(pos)
+
+    def mouse_double_click_event(self, event):
+        if (event.button() == Qt.LeftButton):
+            self.mouse_left_double_click.emit(event)
+
+class DownloadWidget(QWidget, MouseEventMixin):
     complete_progress = pyqtSignal()
 
     def __init__(self, download_keyword, parent = None):
         super(DownloadWidget, self).__init__(parent)
         self.__download_keyword = download_keyword
-        self.__is_mouse_left_press = False
         self.__progress_bar = None
         self.__downloader = Downloader()
         self.__downloader.progress_download.connect(self.on_progress_download)
@@ -56,44 +79,26 @@ class DownloadWidget(QWidget):
     def on_progress_download(self, progress):
         self.__progress_bar.setValue(progress)
 
-    def point_to_parent(self, pos):
-        return QPoint(self.x() + pos.x(), self.y() + pos.y())
-
     def mousePressEvent(self, event):
         super(DownloadWidget, self).mousePressEvent(event)
-        if (event.button() == Qt.LeftButton):
-            self.__is_mouse_left_press = True
-            pos = self.point_to_parent(event.pos())
-            self.mouse_left_press.emit(pos)
+        self.mouse_press_event(event)
 
     def mouseMoveEvent(self, event):
         super(DownloadWidget, self).mouseMoveEvent(event)
-        if (self.__is_mouse_left_press):
-            pos = self.point_to_parent(event.pos())
-            self.mouse_left_move.emit(pos)
+        self.mouse_move_event(event)
 
     def mouseReleaseEvent(self, event):
         super(DownloadWidget, self).mouseReleaseEvent(event)
-        if (event.button() == Qt.LeftButton):
-            self.__is_mouse_left_press = False
-            pos = self.point_to_parent(event.pos())
-            self.mouse_left_release.emit(pos)
+        self.mouse_release_event(event)
 
     def mouseDoubleClickEvent(self, event):
         super(DownloadWidget, self).mouseDoubleClickEvent(event)
-        if (event.button() == Qt.LeftButton):
-            self.mouse_left_double_click.emit(event)
+        self.mouse_double_click_event(event)
 
-class ImageView(QGraphicsView):
-    mouse_left_press = pyqtSignal(QPoint)
-    mouse_left_move = pyqtSignal(QPoint)
-    mouse_left_release = pyqtSignal(QPoint)
-    mouse_left_double_click = pyqtSignal(QMouseEvent)
-
+class ImageView(QGraphicsView, MouseEventMixin):
     def __init__(self, parent = None):
         super(ImageView, self).__init__(parent)
         self.__image = None
-        self.__is_mouse_left_press = False
         self.__timer = QTimer(self)
         self.__image_list = None
         self.init_ui()
@@ -129,9 +134,6 @@ class ImageView(QGraphicsView):
             self.init_image_list()
         self.random_set_image()
 
-    def point_to_parent(self, pos):
-        return QPoint(self.x() + pos.x(), self.y() + pos.y())
-
     def paintEvent(self, event):
         if not self.__image:
             return
@@ -156,28 +158,19 @@ class ImageView(QGraphicsView):
 
     def mousePressEvent(self, event):
         super(ImageView, self).mousePressEvent(event)
-        if (event.button() == Qt.LeftButton):
-            self.__is_mouse_left_press = True
-            pos = self.point_to_parent(event.pos())
-            self.mouse_left_press.emit(pos)
+        self.mouse_press_event(event)
 
     def mouseMoveEvent(self, event):
         super(ImageView, self).mouseMoveEvent(event)
-        if (self.__is_mouse_left_press):
-            pos = self.point_to_parent(event.pos())
-            self.mouse_left_move.emit(pos)
+        self.mouse_move_event(event)
 
     def mouseReleaseEvent(self, event):
         super(ImageView, self).mouseReleaseEvent(event)
-        if (event.button() == Qt.LeftButton):
-            self.__is_mouse_left_press = False
-            pos = self.point_to_parent(event.pos())
-            self.mouse_left_release.emit(pos)
+        self.mouse_release_event(event)
 
     def mouseDoubleClickEvent(self, event):
         super(ImageView, self).mouseDoubleClickEvent(event)
-        if (event.button() == Qt.LeftButton):
-            self.mouse_left_double_click.emit(event)
+        self.mouse_double_click_event(event)
 
 class MainWindow(QWidget):
     def __init__(self, download_keyword, parent = None):
