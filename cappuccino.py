@@ -245,7 +245,7 @@ class MainWindow(QWidget):
 def main():
     app = QApplication(sys.argv)
     download_keyword = sys.argv[1] if (2 <= len(sys.argv)) else ''
-    if not download_keyword and not os.path.isdir(DIR_NAME):
+    if not download_keyword and (not os.path.isdir(DIR_NAME) or not [x for x in os.listdir(DIR_NAME) if os.path.isfile(os.path.join(DIR_NAME, x))]):
         download_keyword = DEFAULT_KEYWORD
 
     window = MainWindow(download_keyword)
