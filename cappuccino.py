@@ -21,30 +21,35 @@ class MouseEventMixin():
     def point_to_parent(self, pos):
         return QPoint(self.x() + pos.x(), self.y() + pos.y())
 
-    def mouse_press_event(self, event):
+    def mousePressEvent(self, event):
+        super(MouseEventMixin, self).mousePressEvent(event)
         if (event.button() == Qt.LeftButton):
             pos = self.point_to_parent(event.pos())
             self.mouse_left_press.emit(pos)
 
-    def mouse_move_event(self, event):
+    def mouseMoveEvent(self, event):
+        super(MouseEventMixin, self).mouseMoveEvent(event)
         if (event.buttons() & Qt.LeftButton):
             pos = self.point_to_parent(event.pos())
             self.mouse_left_move.emit(pos)
 
-    def mouse_release_event(self, event):
+    def mouseReleaseEvent(self, event):
+        super(MouseEventMixin, self).mouseReleaseEvent(event)
         if (event.button() == Qt.LeftButton):
             pos = self.point_to_parent(event.pos())
             self.mouse_left_release.emit(pos)
 
-    def mouse_double_click_event(self, event):
+    def mouseDoubleClickEvent(self, event):
+        super(MouseEventMixin, self).mouseDoubleClickEvent(event)
         if (event.button() == Qt.LeftButton):
             self.mouse_left_double_click.emit(event)
 
-class DownloadWidget(QWidget, MouseEventMixin):
+class DownloadWidget(MouseEventMixin, QWidget):
     complete_progress = pyqtSignal()
 
     def __init__(self, download_keyword, parent = None):
-        super(DownloadWidget, self).__init__(parent)
+        super(DownloadWidget, self).__init__()
+        super(MouseEventMixin, self).__init__(parent)
         self.__download_keyword = download_keyword
         self.__progress_bar = None
         self.__downloader = Downloader()
@@ -79,25 +84,10 @@ class DownloadWidget(QWidget, MouseEventMixin):
     def on_progress_download(self, progress):
         self.__progress_bar.setValue(progress)
 
-    def mousePressEvent(self, event):
-        super(DownloadWidget, self).mousePressEvent(event)
-        self.mouse_press_event(event)
-
-    def mouseMoveEvent(self, event):
-        super(DownloadWidget, self).mouseMoveEvent(event)
-        self.mouse_move_event(event)
-
-    def mouseReleaseEvent(self, event):
-        super(DownloadWidget, self).mouseReleaseEvent(event)
-        self.mouse_release_event(event)
-
-    def mouseDoubleClickEvent(self, event):
-        super(DownloadWidget, self).mouseDoubleClickEvent(event)
-        self.mouse_double_click_event(event)
-
-class ImageView(QGraphicsView, MouseEventMixin):
+class ImageView(MouseEventMixin, QGraphicsView):
     def __init__(self, parent = None):
-        super(ImageView, self).__init__(parent)
+        super(ImageView, self).__init__()
+        super(MouseEventMixin, self).__init__(parent)
         self.__image = None
         self.__timer = QTimer(self)
         self.__image_list = None
@@ -137,6 +127,8 @@ class ImageView(QGraphicsView, MouseEventMixin):
         self.random_set_image()
 
     def paintEvent(self, event):
+        super(MouseEventMixin, self).paintEvent(event)
+
         if not self.__image:
             return
 
@@ -155,24 +147,6 @@ class ImageView(QGraphicsView, MouseEventMixin):
         painter = QPainter(self.viewport())
         painter.drawImage(rect, self.__image)
         painter.end()
-
-        super(ImageView, self).paintEvent(event)
-
-    def mousePressEvent(self, event):
-        super(ImageView, self).mousePressEvent(event)
-        self.mouse_press_event(event)
-
-    def mouseMoveEvent(self, event):
-        super(ImageView, self).mouseMoveEvent(event)
-        self.mouse_move_event(event)
-
-    def mouseReleaseEvent(self, event):
-        super(ImageView, self).mouseReleaseEvent(event)
-        self.mouse_release_event(event)
-
-    def mouseDoubleClickEvent(self, event):
-        super(ImageView, self).mouseDoubleClickEvent(event)
-        self.mouse_double_click_event(event)
 
 class MainWindow(QWidget):
     def __init__(self, download_keyword, parent = None):
