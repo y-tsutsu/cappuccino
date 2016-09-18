@@ -1,4 +1,4 @@
-import sys, os, random, threading
+import sys, os, random, threading, argparse
 from downloader import Downloader
 from indico import filter_image
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QVBoxLayout, QLabel, QProgressBar
@@ -48,10 +48,11 @@ class MouseEventMixin():
 class DownloadWidget(MouseEventMixin, QWidget):
     complete_progress = pyqtSignal()
 
-    def __init__(self, download_keyword, parent = None):
+    def __init__(self, download_keyword, is_filter = False, parent = None):
         super(DownloadWidget, self).__init__()
         super(MouseEventMixin, self).__init__(parent)
         self.__download_keyword = download_keyword
+        self.__is_filter = is_filter
         self.__progress_bar = None
         self.__downloader = Downloader()
         self.__downloader.progress_download.connect(self.on_progress_download)
@@ -78,7 +79,8 @@ class DownloadWidget(MouseEventMixin, QWidget):
         def inner(keyword):
             minsize = (300, 300)
             self.__downloader.download_image(keyword, DOUNLOAD_COUNT, DIR_NAME, minsize)
-            filter_image(DIR_NAME)
+            if self.__is_filter:
+                filter_image(DIR_NAME)
             self.complete_progress.emit()
         th = threading.Thread(target = inner, args = (self.__download_keyword, ))
         th.start()
@@ -151,7 +153,7 @@ class ImageView(MouseEventMixin, QGraphicsView):
         painter.end()
 
 class MainWindow(QWidget):
-    def __init__(self, download_keyword, parent = None):
+    def __init__(self, download_keyword, is_filter = False, parent = None):
         super(MainWindow, self).__init__(parent, Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
         self.__download_widget = None
         self.__image_view = None
@@ -159,7 +161,7 @@ class MainWindow(QWidget):
 
         self.init_common_ui()
         if download_keyword:
-            self.init_download_ui(download_keyword)
+            self.init_download_ui(download_keyword, is_filter)
             self.__download_widget.start_download()
         else:
             self.init_image_ui()
@@ -173,8 +175,8 @@ class MainWindow(QWidget):
         vbox.setContentsMargins(QMargins(0, 0, 0, 0))
         self.setLayout(vbox)
 
-    def init_download_ui(self, download_keyword):
-        self.__download_widget = DownloadWidget(download_keyword)
+    def init_download_ui(self, download_keyword, is_filter):
+        self.__download_widget = DownloadWidget(download_keyword, is_filter)
 
         layout = self.layout()
         layout.removeWidget(self.__image_view)
@@ -222,11 +224,16 @@ class MainWindow(QWidget):
 
 def main():
     app = QApplication(sys.argv)
-    download_keyword = sys.argv[1] if (2 <= len(sys.argv)) else ''
+    parser = argparse.ArgumentParser(description = 'cappuccino')
+    parser.add_argument('download_keyword', nargs = '?', default = '', help = 'Download Keyword')
+    parser.add_argument('-f', '--filter', action = 'store_true', help = 'Content Filtering')
+    args = parser.parse_args()
+
+    download_keyword = args.download_keyword
     if not download_keyword and (not os.path.isdir(DIR_NAME) or not [x for x in os.listdir(DIR_NAME) if os.path.isfile(os.path.join(DIR_NAME, x))]):
         download_keyword = DEFAULT_KEYWORD
 
-    window = MainWindow(download_keyword)
+    window = MainWindow(download_keyword, args.filter)
     window.show()
     sys.exit(app.exec_())
 
