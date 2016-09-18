@@ -1,5 +1,6 @@
 import sys, os, random, threading
 from downloader import Downloader
+from indico import filter_image
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QVBoxLayout, QLabel, QProgressBar
 from PyQt5.QtGui import QPixmap, QPainter, QImage, QMouseEvent
 from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize, QPoint, pyqtSignal
@@ -77,6 +78,7 @@ class DownloadWidget(MouseEventMixin, QWidget):
         def inner(keyword):
             minsize = (300, 300)
             self.__downloader.download_image(keyword, DOUNLOAD_COUNT, DIR_NAME, minsize)
+            filter_image(DIR_NAME)
             self.complete_progress.emit()
         th = threading.Thread(target = inner, args = (self.__download_keyword, ))
         th.start()

@@ -32,6 +32,9 @@
     <Compile Include="downloader.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="indico.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
