@@ -5,15 +5,15 @@ Simple image viewer
 # Requirements
 
 * beautifulsoup4
+* IndicoIo
 * Pillow
 * PyQt5
-* sip
 
 # How to
 
-Download image and Display
+Download image and Display (filter mature content)
 ```
-pythin cappuccino.py image_keyword
+pythin cappuccino.py image_keyword [-f]
 ```
 
 Display of the downloaded image
