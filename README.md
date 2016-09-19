@@ -13,12 +13,12 @@ Simple image viewer
 
 Download image and Display (filter mature content)
 ```
-pythin cappuccino.py image_keyword [-f]
+python cappuccino.py image_keyword [-f]
 ```
 
 Display of the downloaded image
 ```
-pythin cappuccino.py
+python cappuccino.py
 ```
 
 # Pyinstaller
