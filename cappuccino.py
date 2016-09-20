@@ -80,6 +80,7 @@ class DownloadWidget(MouseEventMixin, QWidget):
                 filter_image(DIR_NAME)
             self.complete_progress.emit()
         th = threading.Thread(target = inner, args = (self.__download_keyword, ))
+        th.setDaemon(True)
         th.start()
 
     def on_progress_download(self, progress):
