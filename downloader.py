@@ -7,7 +7,7 @@ class Downloader(QObject):
     progress_download = pyqtSignal(int)
 
     def download_image(self, keyword, download_num, dirname, minsize):
-        if os.path.exists(dirname):
+        if os.path.isdir(dirname):
             shutil.rmtree(dirname)
             time.sleep(1)
         os.mkdir(dirname)
@@ -67,7 +67,7 @@ class Downloader(QObject):
             try:
                 filename = os.path.basename(resource)
                 savename = '{0}\\{1}'.format(dirname, filename)
-                if os.path.exists(savename):
+                if os.path.isfile(savename):
                     continue
                 print('download ---> [{0}]'.format(filename))
                 request = urllib.request.urlopen(resource)
