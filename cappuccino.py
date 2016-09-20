@@ -211,7 +211,7 @@ class MainWindow(QWidget):
         self.__image_view.start_view()
 
     def on_mouse_left_press(self, gpos):
-        self.__mouse_left_press_pos = self.mapTo(self, self.mapFromGlobal(gpos))
+        self.__mouse_left_press_pos = self.mapFromGlobal(gpos) - self.mapFromGlobal(self.pos())
 
     def on_mouse_left_move(self, gpos):
         if not self.__mouse_left_press_pos:
