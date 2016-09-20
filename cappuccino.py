@@ -1,13 +1,15 @@
-import sys, os, random, threading, argparse
+import sys, os, random, threading, argparse, shutil
 from downloader import Downloader
 from indico import filter_image
-from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QVBoxLayout, QLabel, QProgressBar
+from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QVBoxLayout, QLabel, QProgressBar, QMenu, QAction, QMessageBox
 from PyQt5.QtGui import QPixmap, QPainter, QImage, QMouseEvent
 from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize, QPoint, pyqtSignal
 
 DIR_NAME  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
 
 DOUNLOAD_COUNT = 100
+
+MIN_SIZE = (300, 300)
 
 IMAGE_INTERVAL = 20000
 
@@ -74,8 +76,7 @@ class DownloadWidget(MouseEventMixin, QWidget):
 
     def start_download(self):
         def inner(keyword):
-            minsize = (300, 300)
-            self.__downloader.download_image(keyword, DOUNLOAD_COUNT, DIR_NAME, minsize)
+            self.__downloader.download_image(keyword, DOUNLOAD_COUNT, DIR_NAME, MIN_SIZE)
             if self.__is_filter:
                 filter_image(DIR_NAME)
             self.complete_progress.emit()
@@ -185,6 +186,8 @@ class MainWindow(QWidget):
         self.__download_widget.mouse_left_release.connect(self.on_mouse_left_release)
         self.__download_widget.mouse_left_double_click.connect(self.on_mouse_left_double_click)
         self.__download_widget.complete_progress.connect(self.on_complete_progress)
+        self.__download_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.__download_widget.customContextMenuRequested.connect(self.on_context_menu_requested)
 
     def init_image_ui(self):
         self.__image_view = ImageView(self)
@@ -197,6 +200,8 @@ class MainWindow(QWidget):
         self.__image_view.mouse_left_move.connect(self.on_mouse_left_move)
         self.__image_view.mouse_left_release.connect(self.on_mouse_left_release)
         self.__image_view.mouse_left_double_click.connect(self.on_mouse_left_double_click)
+        self.__image_view.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.__image_view.customContextMenuRequested.connect(self.on_context_menu_requested)
 
     def on_complete_progress(self):
         self.init_image_ui()
@@ -215,6 +220,24 @@ class MainWindow(QWidget):
 
     def on_mouse_left_double_click(self, event):
         self.setWindowState(Qt.WindowMinimized)
+
+    def on_context_menu_requested(self, pos):
+        def inner_clear():
+            result = QMessageBox.question(self, self.windowTitle(), 'Delete all image ?', QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
+            if result == QMessageBox.Ok:
+                shutil.rmtree(DIR_NAME)
+
+        menu = QMenu(self)
+        hide = QAction('Hide', self)
+        hide.triggered.connect(lambda: self.setWindowState(Qt.WindowMinimized))
+        clear = QAction('Clear', self)
+        clear.triggered.connect(inner_clear)
+        exit = QAction('Exit', self)
+        exit.triggered.connect(lambda: self.close())
+        menu.addAction(hide)
+        menu.addAction(clear)
+        menu.addAction(exit)
+        menu.exec(self.mapToGlobal(pos))
 
 def main():
     app = QApplication(sys.argv)
