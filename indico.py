@@ -7,7 +7,7 @@ def filter_image(dirname):
     value = indicoio.content_filtering(file)
     filter_file = [x[0] for x in zip(file, value) if 0.5 < x[1]]
     filter_dir = os.path.join(dirname, 'filter')
-    if filter_file and not os.path.exists(filter_dir):
+    if filter_file and not os.path.isdir(filter_dir):
         os.mkdir(filter_dir)
     for x in filter_file:
         shutil.move(x, filter_dir)
