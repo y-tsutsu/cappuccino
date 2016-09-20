@@ -5,13 +5,13 @@ from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QVBoxLayout, Q
 from PyQt5.QtGui import QPixmap, QPainter, QImage, QMouseEvent
 from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize, QPoint, pyqtSignal
 
-DIR_NAME  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
-
 DOUNLOAD_COUNT = 100
 
 MIN_SIZE = (300, 300)
 
 IMAGE_INTERVAL = 20000
+
+DIR_NAME  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
 
 DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
@@ -47,10 +47,11 @@ class MouseEventMixin():
 class DownloadWidget(MouseEventMixin, QWidget):
     complete_progress = pyqtSignal()
 
-    def __init__(self, download_keyword, is_filter = False, parent = None):
+    def __init__(self, download_keyword, dirname, is_filter = False, parent = None):
         super(DownloadWidget, self).__init__()
         super(MouseEventMixin, self).__init__(parent)
         self.__download_keyword = download_keyword
+        self.__dirname = dirname
         self.__is_filter = is_filter
         self.__progress_bar = None
         self.__downloader = Downloader()
@@ -76,9 +77,9 @@ class DownloadWidget(MouseEventMixin, QWidget):
 
     def start_download(self):
         def inner(keyword):
-            self.__downloader.download_image(keyword, DOUNLOAD_COUNT, DIR_NAME, MIN_SIZE)
+            self.__downloader.download_image(keyword, DOUNLOAD_COUNT, self.__dirname, MIN_SIZE)
             if self.__is_filter:
-                filter_image(DIR_NAME)
+                filter_image(self.__dirname)
             self.complete_progress.emit()
         th = threading.Thread(target = inner, args = (self.__download_keyword, ))
         th.setDaemon(True)
@@ -88,9 +89,10 @@ class DownloadWidget(MouseEventMixin, QWidget):
         self.__progress_bar.setValue(progress)
 
 class ImageView(MouseEventMixin, QGraphicsView):
-    def __init__(self, parent = None):
+    def __init__(self, dirname, parent = None):
         super(ImageView, self).__init__()
         super(MouseEventMixin, self).__init__(parent)
+        self.__dirname = dirname
         self.__image = None
         self.__timer = QTimer(self)
         self.__image_list = None
@@ -104,7 +106,7 @@ class ImageView(MouseEventMixin, QGraphicsView):
         self.__timer.timeout.connect(self.on_timeout)
 
     def init_image_list(self):
-        self.__image_list = [x for x in os.listdir(DIR_NAME) if os.path.isfile(os.path.join(DIR_NAME, x))]
+        self.__image_list = [x for x in os.listdir(self.__dirname) if os.path.isfile(os.path.join(self.__dirname, x))]
 
     def start_view(self):
         self.init_image_list()
@@ -122,7 +124,7 @@ class ImageView(MouseEventMixin, QGraphicsView):
             return
         image = random.choice(self.__image_list)
         self.__image_list.remove(image)
-        self.set_image(os.path.join(DIR_NAME, image))
+        self.set_image(os.path.join(self.__dirname, image))
 
     def on_timeout(self):
         if not self.__image_list:
@@ -152,8 +154,9 @@ class ImageView(MouseEventMixin, QGraphicsView):
         painter.end()
 
 class MainWindow(QWidget):
-    def __init__(self, download_keyword, is_filter = False, parent = None):
+    def __init__(self, download_keyword, dirname, is_filter = False, parent = None):
         super(MainWindow, self).__init__(parent, Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
+        self.__dirname = dirname
         self.__download_widget = None
         self.__image_view = None
         self.__mouse_left_press_pos = None
@@ -175,7 +178,7 @@ class MainWindow(QWidget):
         self.setLayout(vbox)
 
     def init_download_ui(self, download_keyword, is_filter):
-        self.__download_widget = DownloadWidget(download_keyword, is_filter)
+        self.__download_widget = DownloadWidget(download_keyword, self.__dirname, is_filter, self)
 
         layout = self.layout()
         layout.removeWidget(self.__image_view)
@@ -190,7 +193,7 @@ class MainWindow(QWidget):
         self.__download_widget.customContextMenuRequested.connect(self.on_context_menu_requested)
 
     def init_image_ui(self):
-        self.__image_view = ImageView(self)
+        self.__image_view = ImageView(self.__dirname, self)
 
         layout = self.layout()
         layout.removeWidget(self.__download_widget)
@@ -225,7 +228,7 @@ class MainWindow(QWidget):
         def inner_clear():
             result = QMessageBox.question(self, self.windowTitle(), 'Delete all image ?', QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
             if result == QMessageBox.Ok:
-                shutil.rmtree(DIR_NAME)
+                shutil.rmtree(self.__dirname)
 
         menu = QMenu(self)
         hide = QAction('Hide', self)
@@ -240,7 +243,6 @@ class MainWindow(QWidget):
         menu.exec(self.mapToGlobal(pos))
 
 def main():
-    app = QApplication(sys.argv)
     parser = argparse.ArgumentParser(description = 'cappuccino')
     parser.add_argument('download_keyword', nargs = '?', default = '', help = 'Download Keyword')
     parser.add_argument('-f', '--filter', action = 'store_true', help = 'Content Filtering')
@@ -250,7 +252,8 @@ def main():
     if not download_keyword and (not os.path.isdir(DIR_NAME) or not [x for x in os.listdir(DIR_NAME) if os.path.isfile(os.path.join(DIR_NAME, x))]):
         download_keyword = DEFAULT_KEYWORD
 
-    window = MainWindow(download_keyword, args.filter)
+    app = QApplication(sys.argv)
+    window = MainWindow(download_keyword, DIR_NAME, args.filter)
     window.show()
     sys.exit(app.exec_())
 
