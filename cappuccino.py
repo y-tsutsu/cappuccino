@@ -19,25 +19,22 @@ class MouseEventMixin():
     mouse_left_release = pyqtSignal(QPoint)
     mouse_left_double_click = pyqtSignal(QMouseEvent)
 
-    def point_to_parent(self, pos):
-        return QPoint(self.x() + pos.x(), self.y() + pos.y())
-
     def mousePressEvent(self, event):
         super(MouseEventMixin, self).mousePressEvent(event)
         if (event.button() == Qt.LeftButton):
-            pos = self.point_to_parent(event.pos())
+            pos = self.mapToGlobal(event.pos())
             self.mouse_left_press.emit(pos)
 
     def mouseMoveEvent(self, event):
         super(MouseEventMixin, self).mouseMoveEvent(event)
         if (event.buttons() & Qt.LeftButton):
-            pos = self.point_to_parent(event.pos())
+            pos = self.mapToGlobal(event.pos())
             self.mouse_left_move.emit(pos)
 
     def mouseReleaseEvent(self, event):
         super(MouseEventMixin, self).mouseReleaseEvent(event)
         if (event.button() == Qt.LeftButton):
-            pos = self.point_to_parent(event.pos())
+            pos = self.mapToGlobal(event.pos())
             self.mouse_left_release.emit(pos)
 
     def mouseDoubleClickEvent(self, event):
@@ -200,23 +197,19 @@ class MainWindow(QWidget):
         self.__image_view.mouse_left_release.connect(self.on_mouse_left_release)
         self.__image_view.mouse_left_double_click.connect(self.on_mouse_left_double_click)
 
-    def point_to_screen(self, pos):
-        return QPoint(self.x() + pos.x(), self.y() + pos.y())
-
     def on_complete_progress(self):
         self.init_image_ui()
         self.__image_view.start_view()
 
-    def on_mouse_left_press(self, pos):
-        self.__mouse_left_press_pos = pos
+    def on_mouse_left_press(self, gpos):
+        self.__mouse_left_press_pos = self.mapTo(self, self.mapFromGlobal(gpos))
 
-    def on_mouse_left_move(self, pos):
+    def on_mouse_left_move(self, gpos):
         if not self.__mouse_left_press_pos:
             return
-        screen_pos = self.point_to_screen(pos)
-        self.move(QPoint(screen_pos.x() - self.__mouse_left_press_pos.x(), screen_pos.y() - self.__mouse_left_press_pos.y()))
+        self.move(gpos - self.__mouse_left_press_pos)
 
-    def on_mouse_left_release(self, pos):
+    def on_mouse_left_release(self, gpos):
         self.__mouse_left_press_pos = None
 
     def on_mouse_left_double_click(self, event):
