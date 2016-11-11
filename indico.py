@@ -1,6 +1,6 @@
 import os, shutil, indicoio
 
-indicoio.config.api_key = 'b6fb24c9b507d984c8c9cf91c01e910d'
+indicoio.config.api_key = 'API Key'
 
 def filter_image(dirname):
     file = [y for y in [os.path.join(dirname, x) for x in os.listdir(dirname)] if os.path.isfile(y)]
