@@ -1,7 +1,12 @@
-import os, sys, shutil, time
-import bs4, urllib.request
+import os
+import sys
+import shutil
+import time
+import bs4
+import urllib.request
 from PIL import Image
 from PyQt5.QtCore import QObject, pyqtSignal
+
 
 class Downloader(QObject):
     progress_download = pyqtSignal(int)
@@ -18,8 +23,10 @@ class Downloader(QObject):
         ONE_PAGE_NUM = 20
         while current_num < download_num:
             count += 1
-            url = 'http://image.search.yahoo.co.jp/search?p={0}&ktot=30&dtot=0&ei=UTF-8&xargs={1}&b={2}'.format(urllib.request.quote(keyword), count, ONE_PAGE_NUM * count + 1)
-            current_num += self.__crawring(url, extensions, dirname, download_num - current_num, current_num, minsize)
+            url = 'http://image.search.yahoo.co.jp/search?p={0}&ktot=30&dtot=0&ei=UTF-8&xargs={1}&b={2}'.format(
+                urllib.request.quote(keyword), count, ONE_PAGE_NUM * count + 1)
+            current_num += self.__crawring(url, extensions, dirname,
+                                           download_num - current_num, current_num, minsize)
             if download_num * 3 < count * ONE_PAGE_NUM:
                 break
 
@@ -61,7 +68,7 @@ class Downloader(QObject):
             except:
                 pass
 
-        resource_list = sorted(set(resource_list), key = resource_list.index)
+        resource_list = sorted(set(resource_list), key=resource_list.index)
         count = 0
         for resource in resource_list:
             try:

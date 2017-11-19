@@ -1,4 +1,9 @@
-import sys, os, random, threading, argparse, shutil
+import sys
+import os
+import random
+import threading
+import argparse
+import shutil
 from downloader import Downloader
 from indico import filter_image
 from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QVBoxLayout, QLabel, QProgressBar, QMenu, QAction, QMessageBox
@@ -11,9 +16,10 @@ MIN_SIZE = (300, 300)
 
 IMAGE_INTERVAL = 20000
 
-DIR_NAME  = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
+DIR_NAME = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
 
 DEFAULT_KEYWORD = '女性ヘアカタログロング'
+
 
 class MouseEventMixin():
     mouse_left_press = pyqtSignal(QPoint)
@@ -44,10 +50,11 @@ class MouseEventMixin():
         if (event.button() == Qt.LeftButton):
             self.mouse_left_double_click.emit(event)
 
+
 class DownloadWidget(MouseEventMixin, QWidget):
     complete_progress = pyqtSignal()
 
-    def __init__(self, download_keyword, dirname, is_filter = False, parent = None):
+    def __init__(self, download_keyword, dirname, is_filter=False, parent=None):
         super(DownloadWidget, self).__init__()
         super(MouseEventMixin, self).__init__(parent)
         self.__download_keyword = download_keyword
@@ -77,19 +84,21 @@ class DownloadWidget(MouseEventMixin, QWidget):
 
     def start_download(self):
         def inner(keyword):
-            self.__downloader.download_image(keyword, DOUNLOAD_COUNT, self.__dirname, MIN_SIZE)
+            self.__downloader.download_image(
+                keyword, DOUNLOAD_COUNT, self.__dirname, MIN_SIZE)
             if self.__is_filter:
                 filter_image(self.__dirname)
             self.complete_progress.emit()
-        th = threading.Thread(target = inner, args = (self.__download_keyword, ))
+        th = threading.Thread(target=inner, args=(self.__download_keyword, ))
         th.setDaemon(True)
         th.start()
 
     def on_progress_download(self, progress):
         self.__progress_bar.setValue(progress)
 
+
 class ImageView(MouseEventMixin, QGraphicsView):
-    def __init__(self, dirname, parent = None):
+    def __init__(self, dirname, parent=None):
         super(ImageView, self).__init__()
         super(MouseEventMixin, self).__init__(parent)
         self.__dirname = dirname
@@ -100,13 +109,15 @@ class ImageView(MouseEventMixin, QGraphicsView):
 
     def init_ui(self):
         self.setCacheMode(QGraphicsView.CacheBackground)
-        self.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform | QPainter.TextAntialiasing)
+        self.setRenderHints(
+            QPainter.Antialiasing | QPainter.SmoothPixmapTransform | QPainter.TextAntialiasing)
 
         self.__timer.setInterval(IMAGE_INTERVAL)
         self.__timer.timeout.connect(self.on_timeout)
 
     def init_image_list(self):
-        self.__image_list = [x for x in os.listdir(self.__dirname) if os.path.isfile(os.path.join(self.__dirname, x))]
+        self.__image_list = [x for x in os.listdir(
+            self.__dirname) if os.path.isfile(os.path.join(self.__dirname, x))]
 
     def start_view(self):
         self.init_image_list()
@@ -115,7 +126,8 @@ class ImageView(MouseEventMixin, QGraphicsView):
 
     def set_image(self, filename):
         self.__image = QImage(filename)
-        self.setUpdatesEnabled(False)   # ステータスを書き換えないとrepaint()が効かなかった対策．もっとまともな手はないか．．．
+        # ステータスを書き換えないとrepaint()が効かなかった対策．もっとまともな手はないか．．．
+        self.setUpdatesEnabled(False)
         self.setUpdatesEnabled(True)
         self.repaint()
 
@@ -144,18 +156,22 @@ class ImageView(MouseEventMixin, QGraphicsView):
         view_aspect_ratio = self.width() / self.height()
         if view_aspect_ratio <= image_aspect_ratio:
             image_height = self.width() / image_aspect_ratio
-            rect = QRectF(0, (self.height() - image_height) / 2, self.width(), image_height)
+            rect = QRectF(0, (self.height() - image_height) /
+                          2, self.width(), image_height)
         else:
             image_widh = self.height() * image_aspect_ratio
-            rect = QRectF((self.width() - image_widh) / 2, 0, image_widh, self.height())
+            rect = QRectF((self.width() - image_widh) /
+                          2, 0, image_widh, self.height())
 
         painter = QPainter(self.viewport())
         painter.drawImage(rect, self.__image)
         painter.end()
 
+
 class MainWindow(QWidget):
-    def __init__(self, download_keyword, dirname, is_filter = False, parent = None):
-        super(MainWindow, self).__init__(parent, Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
+    def __init__(self, download_keyword, dirname, is_filter=False, parent=None):
+        super(MainWindow, self).__init__(
+            parent, Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
         self.__dirname = dirname
         self.__download_widget = None
         self.__image_view = None
@@ -178,19 +194,25 @@ class MainWindow(QWidget):
         self.setLayout(vbox)
 
     def init_download_ui(self, download_keyword, is_filter):
-        self.__download_widget = DownloadWidget(download_keyword, self.__dirname, is_filter, self)
+        self.__download_widget = DownloadWidget(
+            download_keyword, self.__dirname, is_filter, self)
 
         layout = self.layout()
         layout.removeWidget(self.__image_view)
         layout.addWidget(self.__download_widget)
 
-        self.__download_widget.mouse_left_press.connect(self.on_mouse_left_press)
+        self.__download_widget.mouse_left_press.connect(
+            self.on_mouse_left_press)
         self.__download_widget.mouse_left_move.connect(self.on_mouse_left_move)
-        self.__download_widget.mouse_left_release.connect(self.on_mouse_left_release)
-        self.__download_widget.mouse_left_double_click.connect(self.on_mouse_left_double_click)
-        self.__download_widget.complete_progress.connect(self.on_complete_progress)
+        self.__download_widget.mouse_left_release.connect(
+            self.on_mouse_left_release)
+        self.__download_widget.mouse_left_double_click.connect(
+            self.on_mouse_left_double_click)
+        self.__download_widget.complete_progress.connect(
+            self.on_complete_progress)
         self.__download_widget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.__download_widget.customContextMenuRequested.connect(self.on_context_menu_requested)
+        self.__download_widget.customContextMenuRequested.connect(
+            self.on_context_menu_requested)
 
     def init_image_ui(self):
         self.__image_view = ImageView(self.__dirname, self)
@@ -201,17 +223,21 @@ class MainWindow(QWidget):
 
         self.__image_view.mouse_left_press.connect(self.on_mouse_left_press)
         self.__image_view.mouse_left_move.connect(self.on_mouse_left_move)
-        self.__image_view.mouse_left_release.connect(self.on_mouse_left_release)
-        self.__image_view.mouse_left_double_click.connect(self.on_mouse_left_double_click)
+        self.__image_view.mouse_left_release.connect(
+            self.on_mouse_left_release)
+        self.__image_view.mouse_left_double_click.connect(
+            self.on_mouse_left_double_click)
         self.__image_view.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.__image_view.customContextMenuRequested.connect(self.on_context_menu_requested)
+        self.__image_view.customContextMenuRequested.connect(
+            self.on_context_menu_requested)
 
     def on_complete_progress(self):
         self.init_image_ui()
         self.__image_view.start_view()
 
     def on_mouse_left_press(self, gpos):
-        self.__mouse_left_press_pos = self.mapFromGlobal(gpos) - self.mapFromGlobal(self.pos())
+        self.__mouse_left_press_pos = self.mapFromGlobal(
+            gpos) - self.mapFromGlobal(self.pos())
 
     def on_mouse_left_move(self, gpos):
         if not self.__mouse_left_press_pos:
@@ -226,7 +252,8 @@ class MainWindow(QWidget):
 
     def on_context_menu_requested(self, pos):
         def inner_clear():
-            result = QMessageBox.question(self, self.windowTitle(), 'Delete all image ?', QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
+            result = QMessageBox.question(self, self.windowTitle(
+            ), 'Delete all image ?', QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
             if result == QMessageBox.Ok:
                 shutil.rmtree(self.__dirname)
 
@@ -242,10 +269,13 @@ class MainWindow(QWidget):
         menu.addAction(exit)
         menu.exec(self.mapToGlobal(pos))
 
+
 def main():
-    parser = argparse.ArgumentParser(description = 'cappuccino')
-    parser.add_argument('download_keyword', nargs = '?', default = '', help = 'Download Keyword')
-    parser.add_argument('-f', '--filter', action = 'store_true', help = 'Content Filtering')
+    parser = argparse.ArgumentParser(description='cappuccino')
+    parser.add_argument('download_keyword', nargs='?',
+                        default='', help='Download Keyword')
+    parser.add_argument('-f', '--filter', action='store_true',
+                        help='Content Filtering')
     args = parser.parse_args()
 
     download_keyword = args.download_keyword
@@ -256,6 +286,7 @@ def main():
     window = MainWindow(download_keyword, DIR_NAME, args.filter)
     window.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
