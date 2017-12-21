@@ -73,7 +73,7 @@ class Downloader(QObject):
         for resource in resource_list:
             try:
                 filename = os.path.basename(resource)
-                savename = '{0}\\{1}'.format(dirname, filename)
+                savename = os.path.join(dirname, filename)
                 if os.path.isfile(savename):
                     continue
                 print('download ---> [{0}]'.format(filename))
