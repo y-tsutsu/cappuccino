@@ -1,14 +1,19 @@
-import sys
+import argparse
 import os
 import random
-import threading
-import argparse
 import shutil
+import sys
+import threading
+
+from PyQt5.QtCore import (QMargins, QPoint, QRectF, QSize, Qt, QTimer,
+                          pyqtSignal)
+from PyQt5.QtGui import QImage, QMouseEvent, QPainter, QPixmap
+from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsView, QLabel,
+                             QMenu, QMessageBox, QProgressBar, QVBoxLayout,
+                             QWidget)
+
 from downloader import Downloader
 from indico import filter_image
-from PyQt5.QtWidgets import QApplication, QWidget, QGraphicsView, QVBoxLayout, QLabel, QProgressBar, QMenu, QAction, QMessageBox
-from PyQt5.QtGui import QPixmap, QPainter, QImage, QMouseEvent
-from PyQt5.QtCore import Qt, QMargins, QRectF, QTimer, QSize, QPoint, pyqtSignal
 
 DOUNLOAD_COUNT = 100
 

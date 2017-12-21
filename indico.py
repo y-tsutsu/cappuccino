@@ -1,5 +1,6 @@
 import os
 import shutil
+
 import indicoio
 
 indicoio.config.api_key = 'API Key'

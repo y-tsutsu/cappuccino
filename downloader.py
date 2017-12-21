@@ -1,9 +1,10 @@
 import os
-import sys
 import shutil
+import sys
 import time
-import bs4
 import urllib.request
+
+import bs4
 from PIL import Image
 from PyQt5.QtCore import QObject, pyqtSignal
 
