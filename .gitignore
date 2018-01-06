@@ -33,3 +33,4 @@ image/
 build/
 dist/
 *.spec
+.vscode/
