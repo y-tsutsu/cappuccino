@@ -18,9 +18,10 @@ pbr==3.1.1                # via mock
 pefile==2017.11.5         # via pyinstaller
 pillow==5.0.0             # via indicoio
 pyinstaller==3.3.1
-pypiwin32==220            # via pyinstaller
-pyqt5==5.10
+pypiwin32==223            # via pyinstaller
+pyqt5==5.10.1
+pywin32==223              # via pypiwin32
 requests==2.18.4          # via indicoio
-sip==4.19.7               # via pyqt5
+sip==4.19.8               # via pyqt5
 six==1.11.0               # via indicoio, mock
 urllib3==1.22             # via requests
