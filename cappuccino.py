@@ -7,7 +7,7 @@ import threading
 
 from PyQt5.QtCore import (QMargins, QPoint, QRectF, QSize, Qt, QTimer,
                           pyqtSignal)
-from PyQt5.QtGui import QImage, QMouseEvent, QPainter, QPixmap
+from PyQt5.QtGui import QIcon, QImage, QMouseEvent, QPainter, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsView, QLabel,
                              QMenu, QMessageBox, QProgressBar, QVBoxLayout,
                              QWidget)
@@ -275,6 +275,12 @@ class MainWindow(QWidget):
         menu.exec(self.mapToGlobal(pos))
 
 
+def resource_path(relative):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative)
+    return os.path.join(relative)
+
+
 def main():
     parser = argparse.ArgumentParser(description='cappuccino')
     parser.add_argument('download_keyword', nargs='?',
@@ -288,9 +294,10 @@ def main():
         download_keyword = DEFAULT_KEYWORD
 
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(resource_path('cappuccino.ico')))
     window = MainWindow(download_keyword, DIR_NAME, args.filter)
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':

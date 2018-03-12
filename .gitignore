@@ -32,5 +32,4 @@ __pycache__
 image/
 build/
 dist/
-*.spec
 .vscode/
