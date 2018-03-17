@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['cappuccino.py'],
-             pathex=['C:\\work\\Python\\cappuccino'],
+             pathex=['.\\cappuccino'],
              binaries=[],
              datas=[],
              hiddenimports=[],
