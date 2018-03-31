@@ -6,22 +6,19 @@
 #
 altgraph==0.15            # via macholib
 beautifulsoup4==4.6.0
-certifi==2018.1.18        # via requests
+certifi==2018.4.16        # via requests
 chardet==3.0.4            # via requests
 future==0.16.0            # via pefile, pyinstaller
-futures==3.1.1            # via indicoio
 idna==2.6                 # via requests
-indicoio==1.1.1
+indicoio==1.1.3
 macholib==1.9             # via pyinstaller
-mock==1.3.0               # via indicoio
-pbr==3.1.1                # via mock
 pefile==2017.11.5         # via pyinstaller
-pillow==5.0.0             # via indicoio
+pillow==5.1.0             # via indicoio
 pyinstaller==3.3.1
 pypiwin32==223            # via pyinstaller
 pyqt5==5.10.1
 pywin32==223              # via pypiwin32
 requests==2.18.4          # via indicoio
 sip==4.19.8               # via pyqt5
-six==1.11.0               # via indicoio, mock
+six==1.11.0               # via indicoio
 urllib3==1.22             # via requests
