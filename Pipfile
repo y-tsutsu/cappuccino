@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+beautifulsoup4 = "*"
+indicoio = "*"
+pyinstaller = "*"
+pyqt5 = "*"
+
+[dev-packages]
+"autopep8" = "*"
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+start = "python cappuccino.py"
+build = "pyinstaller.exe cappuccino.spec"
+clean = "rm -rf build/ dist/cappuccino.exe"
