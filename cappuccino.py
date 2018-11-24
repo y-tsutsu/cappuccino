@@ -5,9 +5,8 @@ import shutil
 import sys
 import threading
 
-from PyQt5.QtCore import (QMargins, QPoint, QRectF, QSize, Qt, QTimer,
-                          pyqtSignal)
-from PyQt5.QtGui import QIcon, QImage, QMouseEvent, QPainter, QPixmap
+from PyQt5.QtCore import QMargins, QPoint, QRectF, Qt, QTimer, pyqtSignal
+from PyQt5.QtGui import QIcon, QImage, QMouseEvent, QPainter
 from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsView, QLabel,
                              QMenu, QMessageBox, QProgressBar, QVBoxLayout,
                              QWidget)

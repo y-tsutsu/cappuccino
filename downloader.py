@@ -48,7 +48,7 @@ class Downloader(QObject):
         try:
             request = urllib.request.urlopen(url)
             html = request.read()
-        except:
+        except Exception:
             return decoded_html
 
         # HTMLをデコード
@@ -66,7 +66,7 @@ class Downloader(QObject):
                 (path, ext) = os.path.splitext(href_str)
                 if ext in extensions:
                     resource_list.append(href_str)
-            except:
+            except Exception:
                 pass
 
         resource_list = sorted(set(resource_list), key=resource_list.index)
