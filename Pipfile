@@ -12,13 +12,15 @@ repo = "*"
 [packages]
 beautifulsoup4 = "*"
 indicoio = "*"
+pillow = "*"
 pyqt5 = "*"
+selenium = "*"
 
 [requires]
 python_version = "3.7"
 
 [scripts]
-start = "python cappuccino.py"
+start = "python cappuccino.py -s"
 build = "pyinstaller.exe cappuccino.spec"
 clean = "rm -rf build/ dist/cappuccino.exe"
 lint = "flake8 --statistics --show-source ./"
