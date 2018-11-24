@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import sys
@@ -18,35 +19,33 @@ class Downloader(QObject):
             time.sleep(1)
         os.mkdir(dirname)
 
-        extensions = ['.jpg', '.jpeg', '.gif', '.png']
-        count = 0
-        current_num = 0
-        ONE_PAGE_NUM = 20
-        while current_num < download_num:
-            count += 1
-            url = 'http://image.search.yahoo.co.jp/search?p={0}&ktot=30&dtot=0&ei=UTF-8&xargs={1}&b={2}'.format(
-                urllib.request.quote(keyword), count, ONE_PAGE_NUM * count + 1)
-            current_num += self.__crawring(url, extensions, dirname,
-                                           download_num - current_num, current_num, minsize)
-            if download_num * 3 < count * ONE_PAGE_NUM:
-                break
+        extensions = ['jpg', 'jpeg', 'gif', 'png']
+        url = 'https://www.google.com/search?q={}&hl=ja&source=lnms&tbm=isch'.format(
+            urllib.request.quote(keyword))
+        header = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.113 Safari/537.36 Viv/2.1.1337.51'}
 
-    def __crawring(self, url, extensions, dirname, download_num, current_num, minsize):
+        count = self.__crawring(url, header, extensions,
+                                dirname, download_num, minsize)
+        print('{} files downloaded.'.format(count))
+
+    def __crawring(self, url, header, extensions, dirname, download_num, minsize):
         # 指定したURLのHTMLを取得
-        html = self.__get_html_string(url)
-        if len(html) < 1:
+        html = self.__get_html_string(url, header)
+        if html == '':
             print('damepo!!')
             sys.exit(1)
 
         # リソース取得
-        return self.__get_resource(html, extensions, dirname, download_num, current_num, minsize)
+        return self.__get_resource(html, extensions, dirname, download_num, minsize)
 
-    def __get_html_string(self, url):
+    def __get_html_string(self, url, header):
         decoded_html = ''
 
         # HTMLを取得
         try:
-            request = urllib.request.urlopen(url)
+            request = urllib.request.urlopen(
+                urllib.request.Request(url, headers=header))
             html = request.read()
         except Exception:
             return decoded_html
@@ -56,20 +55,15 @@ class Downloader(QObject):
 
         return decoded_html
 
-    def __get_resource(self, html, extensions, dirname, download_num, current_num, minsize):
+    def __get_resource(self, html, extensions, dirname, download_num, minsize):
         resource_list = []
 
         soup = bs4.BeautifulSoup(html)
-        for a_tag in soup.find_all('a'):
-            href_str = a_tag.get('href')
-            try:
-                (path, ext) = os.path.splitext(href_str)
-                if ext in extensions:
-                    resource_list.append(href_str)
-            except Exception:
-                pass
+        for div_tag in soup.find_all('div', {'class': 'rg_meta'}):
+            j = json.loads(div_tag.text)
+            if j['ity'] in extensions:
+                resource_list.append(j['ou'])
 
-        resource_list = sorted(set(resource_list), key=resource_list.index)
         count = 0
         for resource in resource_list:
             try:
@@ -83,7 +77,7 @@ class Downloader(QObject):
                     f.write(request.read())
                 if self.__check_size(savename, minsize):
                     count += 1
-                    self.progress_download.emit(current_num + count)
+                    self.progress_download.emit(count)
                 else:
                     os.remove(savename)
                 if download_num <= count:
@@ -97,3 +91,12 @@ class Downloader(QObject):
     def __check_size(self, filename, minsize):
         f = Image.open(filename)
         return True if minsize[0] <= f.size[0] and minsize[1] <= f.size[1] else False
+
+
+def main():
+    d = Downloader()
+    d.download_image('女性ヘアカタログロング', 100, './foo', (300, 300))
+
+
+if __name__ == "__main__":
+    main()
