@@ -7,12 +7,12 @@ import urllib.request
 
 import bs4
 from PIL import Image
-from PyQt5.QtCore import QObject, pyqtSignal
 from selenium import webdriver
 
 
-class Downloader(QObject):
-    progress_download = pyqtSignal(int)
+class Downloader():
+    def __init__(self, progress_callback=None):
+        self.__progress_callback = progress_callback
 
     def download_image(self, keyword, download_num, dirname, minsize, is_selenium):
         if os.path.isdir(dirname):
@@ -93,7 +93,8 @@ class Downloader(QObject):
                     f.write(request.read())
                 if self.__check_size(savename, minsize):
                     count += 1
-                    self.progress_download.emit(count)
+                    if self.__progress_callback:
+                        self.__progress_callback(count)
                 else:
                     os.remove(savename)
                 if download_num <= count:

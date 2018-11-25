@@ -56,6 +56,7 @@ class MouseEventMixin():
 
 
 class DownloadWidget(MouseEventMixin, QWidget):
+    __progress_download = pyqtSignal(int)
     complete_progress = pyqtSignal()
 
     def __init__(self, download_keyword, dirname, is_filter=False, is_selenium=False, parent=None):
@@ -66,8 +67,8 @@ class DownloadWidget(MouseEventMixin, QWidget):
         self.__is_filter = is_filter
         self.__is_selenium = is_selenium
         self.__progress_bar = None
-        self.__downloader = Downloader()
-        self.__downloader.progress_download.connect(self.on_progress_download)
+        self.__downloader = Downloader(self.progress_download_callback)
+        self.__progress_download.connect(self.on_progress_download)
 
         self.init_ui()
 
@@ -97,6 +98,9 @@ class DownloadWidget(MouseEventMixin, QWidget):
         th = threading.Thread(target=inner, args=(self.__download_keyword, ))
         th.setDaemon(True)
         th.start()
+
+    def progress_download_callback(self, progress):
+        self.__progress_download.emit(progress)
 
     def on_progress_download(self, progress):
         self.__progress_bar.setValue(progress)
