@@ -185,6 +185,7 @@ class MainWindow(QWidget):
         self.__download_widget = None
         self.__image_view = None
         self.__mouse_left_press_pos = None
+        self.__menu = QMenu(self)
 
         self.init_common_ui()
         if download_keyword:
@@ -201,6 +202,40 @@ class MainWindow(QWidget):
         vbox = QVBoxLayout(self)
         vbox.setContentsMargins(QMargins(0, 0, 0, 0))
         self.setLayout(vbox)
+
+        self.init_menu()
+
+    def init_menu(self):
+        def _inner_clear():
+            result = QMessageBox.question(self, self.windowTitle(
+            ), 'Delete all image ?', QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
+            if result == QMessageBox.Ok:
+                shutil.rmtree(self.__dirname)
+
+        _window = self
+
+        def _inner_toggle(state):
+            if state:
+                _window.setWindowFlags(
+                    _window.windowFlags() | Qt.WindowStaysOnTopHint)
+            else:
+                _window.setWindowFlags(
+                    _window.windowFlags() & ~Qt.WindowStaysOnTopHint)
+            _window.show()
+
+        top = QAction('&Top', self, checkable=True)
+        top.triggered.connect(_inner_toggle)
+        top.setChecked(True)
+        hide = QAction('&Hide', self)
+        hide.triggered.connect(lambda: self.setWindowState(Qt.WindowMinimized))
+        clear = QAction('&Clear', self)
+        clear.triggered.connect(_inner_clear)
+        exit_ = QAction('&Exit', self)
+        exit_.triggered.connect(lambda: self.close())
+        self.__menu.addAction(top)
+        self.__menu.addAction(hide)
+        self.__menu.addAction(clear)
+        self.__menu.addAction(exit_)
 
     def init_download_ui(self, download_keyword, is_filter, is_selenium):
         self.__download_widget = DownloadWidget(
@@ -260,23 +295,7 @@ class MainWindow(QWidget):
         self.setWindowState(Qt.WindowMinimized)
 
     def on_context_menu_requested(self, pos):
-        def inner_clear():
-            result = QMessageBox.question(self, self.windowTitle(
-            ), 'Delete all image ?', QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
-            if result == QMessageBox.Ok:
-                shutil.rmtree(self.__dirname)
-
-        menu = QMenu(self)
-        hide = QAction('&Hide', self)
-        hide.triggered.connect(lambda: self.setWindowState(Qt.WindowMinimized))
-        clear = QAction('&Clear', self)
-        clear.triggered.connect(inner_clear)
-        exit = QAction('&Exit', self)
-        exit.triggered.connect(lambda: self.close())
-        menu.addAction(hide)
-        menu.addAction(clear)
-        menu.addAction(exit)
-        menu.exec(self.mapToGlobal(pos))
+        self.__menu.exec(self.mapToGlobal(pos))
 
 
 def resource_path(relative):
