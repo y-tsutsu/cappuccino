@@ -196,7 +196,7 @@ class MainWindow(QWidget):
             self.__image_view.start_view()
 
     def init_common_ui(self):
-        self.resize(500, 300)
+        self.resize(750, 450)
         self.setWindowTitle("cappuccino")
 
         vbox = QVBoxLayout(self)
