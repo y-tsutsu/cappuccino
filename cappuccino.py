@@ -7,9 +7,9 @@ import threading
 
 from PyQt5.QtCore import QMargins, QPoint, QRectF, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QIcon, QImage, QMouseEvent, QPainter
-from PyQt5.QtWidgets import (QAction, QApplication, QGraphicsView, QLabel,
-                             QMenu, QMessageBox, QProgressBar, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
+                             QGraphicsView, QLabel, QMenu, QMessageBox,
+                             QProgressBar, QVBoxLayout, QWidget)
 
 from downloader import Downloader
 from indico import filter_image
@@ -196,7 +196,8 @@ class MainWindow(QWidget):
             self.__image_view.start_view()
 
     def init_common_ui(self):
-        self.resize(750, 450)
+        height = QDesktopWidget().height() // 5
+        self.resize(height * 5 // 3, height)
         self.setWindowTitle("cappuccino")
 
         vbox = QVBoxLayout(self)
