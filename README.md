@@ -1,6 +1,6 @@
 # cappuccino
 
-Simple image viewer
+Simple image viewer with download
 
 # Requirements
 
@@ -10,32 +10,52 @@ Simple image viewer
 * PyQt5
 * Selenium
 
-# How to
-
-Download image and Display (filter mature content) (by Selenium)
-```console
-$ python cappuccino.py image_keyword [-f] [-s]
-```
-
-Selenium(Chrome)  
-[https://sites.google.com/a/chromium.org/chromedriver/home](https://sites.google.com/a/chromium.org/chromedriver/home)
-
-Display of the downloaded image
-```console
-$ python cappuccino.py
-```
-
-# Pipenv
+# Initialize (Pipenv)
 
 ```console
 $ pip install pipenv
-$ pipenv install --dev
-$ pipenv run start
+$ pipenv sync --dev
 ```
 
-# Pyinstaller
+# How to
+
+## Download image and Display (filter mature content) (by selenium)
 
 ```console
-$ pip install pyinstaller
-$ pyinstaller cappuccino.py --onefile --noconsole --clean
+$ pipenv run python cappuccino.py [-f] [-s] download_keyword
+```
+
+```console
+usage: cappuccino.py [-h] [-f] [-s] [download_keyword]
+
+cappuccino
+
+positional arguments:
+  download_keyword  image keyword to download
+
+optional arguments:
+  -h, --help        show this help message and exit
+  -f, --filter      filter mature content
+  -s, --selenium    download by selenium
+```
+
+### Selenium (Chrome)
+
+Save ChromeDriver to current directory  
+[https://sites.google.com/a/chromium.org/chromedriver/home](https://sites.google.com/a/chromium.org/chromedriver/home)
+
+## Display of the downloaded image
+
+```console
+$ pipenv run start
+or
+$ pipenv run python cappuccino.py
+```
+
+# Build by Pyinstaller
+
+```console
+$ pipenv run build
+or
+$ pipenv run pyinstaller cappuccino.py --onefile --noconsole --clean
 ```

@@ -308,11 +308,11 @@ def resource_path(relative):
 def main():
     parser = argparse.ArgumentParser(description='cappuccino')
     parser.add_argument('download_keyword', nargs='?',
-                        default='', help='Download Keyword')
+                        default='', help='image keyword to download')
     parser.add_argument('-f', '--filter', action='store_true',
-                        help='Content Filtering')
+                        help='filter mature content')
     parser.add_argument('-s', '--selenium', action='store_true',
-                        help='Download by Selenium')
+                        help='download by selenium')
     args = parser.parse_args()
 
     download_keyword = args.download_keyword
