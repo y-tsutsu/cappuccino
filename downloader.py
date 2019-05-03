@@ -21,14 +21,13 @@ class Downloader():
         os.mkdir(dirname)
 
         extensions = ['jpg', 'jpeg', 'gif', 'png']
-        url = 'https://www.google.com/search?q={}&hl=ja&source=lnms&tbm=isch'.format(
-            urllib.request.quote(keyword))
+        url = f'https://www.google.com/search?q={urllib.request.quote(keyword)}&hl=ja&source=lnms&tbm=isch'
         header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.113 Safari/537.36 Viv/2.1.1337.51'}
 
         count = self.__crawring(url, header, extensions,
                                 dirname, download_num, minsize, is_selenium)
-        print('{} files downloaded.'.format(count))
+        print(f'{count} files downloaded.')
 
     def __crawring(self, url, header, extensions, dirname, download_num, minsize, is_selenium):
         # 指定したURLのHTMLを取得
@@ -84,10 +83,11 @@ class Downloader():
                 filename = os.path.basename(resource)
                 if '?' in filename:
                     filename = filename[:filename.index('?')]
-                savename = os.path.join(dirname, filename)
+                _, ext = os.path.splitext(filename)
+                savename = os.path.join(dirname, f'{count:03}{ext}')
                 if os.path.isfile(savename):
                     continue
-                print('download ---> [{0}]'.format(filename))
+                print(f'download ---> [{os.path.basename(savename)}]')
                 request = urllib.request.urlopen(resource)
                 with open(savename, 'wb') as f:
                     f.write(request.read())
@@ -101,7 +101,7 @@ class Downloader():
                     break
             except Exception as e:
                 print(e)
-                print('download failed ... [{0}]'.format(filename))
+                print(f'download failed ... [{os.path.basename(savename)}]')
 
         return count
 
