@@ -6,7 +6,7 @@ import time
 import urllib.request
 
 import bs4
-from PIL import Image
+from cv2 import imread
 from selenium import webdriver
 
 
@@ -25,8 +25,7 @@ class Downloader():
         header = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.113 Safari/537.36 Viv/2.1.1337.51'}
 
-        count = self.__crawring(url, header, extensions,
-                                dirname, download_num, minsize, is_selenium)
+        count = self.__crawring(url, header, extensions, dirname, download_num, minsize, is_selenium)
         print(f'{count} files downloaded.')
 
     def __crawring(self, url, header, extensions, dirname, download_num, minsize, is_selenium):
@@ -50,21 +49,18 @@ class Downloader():
                 driver.minimize_window()
                 for i in range(3):
                     driver.get(url)
-                    driver.execute_script(
-                        'window.scrollTo(0, document.body.scrollHeight);')
+                    driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
                     time.sleep(1)
                 time.sleep(1)
                 html = driver.page_source
             else:
-                request = urllib.request.urlopen(
-                    urllib.request.Request(url, headers=header))
+                request = urllib.request.urlopen(urllib.request.Request(url, headers=header))
                 html = request.read().decode('utf_8')
         except Exception as ex:
             print(ex)
         finally:
             if driver:
                 driver.close()
-                pass
 
         return html
 
@@ -106,5 +102,6 @@ class Downloader():
         return count
 
     def __check_size(self, filename, minsize):
-        f = Image.open(filename)
-        return True if minsize[0] <= f.size[0] and minsize[1] <= f.size[1] else False
+        img = imread(filename)
+        haight, width, _ = img.shape
+        return True if minsize[0] <= width and minsize[1] <= haight else False

@@ -11,8 +11,7 @@ rope = "*"
 
 [packages]
 beautifulsoup4 = "*"
-indicoio = "*"
-pillow = "==5.3.0"
+opencv-python = "*"
 pyqt5 = "*"
 selenium = "*"
 

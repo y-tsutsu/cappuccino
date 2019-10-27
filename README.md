@@ -5,8 +5,7 @@ Simple image viewer with download
 # Requirements
 
 * beautifulsoup4
-* IndicoIo
-* Pillow
+* OpenCV
 * PyQt5
 * Selenium
 
@@ -19,14 +18,14 @@ $ pipenv sync --dev
 
 # How to
 
-## Download image and Display (filter mature content) (by selenium)
+## Download image and Display (by selenium)
 
 ```console
-$ pipenv run python cappuccino.py [-f] [-s] download_keyword
+$ pipenv run python cappuccino.py [-s] download_keyword
 ```
 
 ```console
-usage: cappuccino.py [-h] [-f] [-s] [download_keyword]
+usage: cappuccino.py [-h] [-s] [download_keyword]
 
 cappuccino
 
@@ -35,7 +34,6 @@ positional arguments:
 
 optional arguments:
   -h, --help        show this help message and exit
-  -f, --filter      filter mature content
   -s, --selenium    download by selenium
 ```
 
