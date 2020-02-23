@@ -19,7 +19,7 @@ selenium = "*"
 python_version = "3.7"
 
 [scripts]
-start = "python cappuccino.py -s"
+start = "python cappuccino.py"
 build = "pyinstaller.exe cappuccino.spec"
 clean = "rm -rf build/ dist/cappuccino.exe"
 lint = "flake8 --statistics --show-source ./"

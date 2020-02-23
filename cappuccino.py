@@ -1,9 +1,10 @@
-import argparse
-import os
 import random
 import shutil
 import sys
-import threading
+from argparse import ArgumentParser
+from os import path
+from pathlib import Path
+from threading import Thread
 
 from PyQt5.QtCore import QMargins, QPoint, QRectF, Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QIcon, QImage, QMouseEvent, QPainter
@@ -19,7 +20,7 @@ MIN_SIZE = (300, 300)
 
 IMAGE_INTERVAL = 20000
 
-DIR_NAME = os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])), 'image')
+DIR_NAME = path.join(path.abspath(path.dirname(sys.argv[0])), 'image')
 
 DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
@@ -58,12 +59,11 @@ class DownloadWidget(MouseEventMixin, QWidget):
     __progress_download = pyqtSignal(int)
     complete_progress = pyqtSignal()
 
-    def __init__(self, download_keyword, dirname, is_selenium=False, parent=None):
+    def __init__(self, download_keyword, dirname, parent=None):
         super(DownloadWidget, self).__init__()
         super(MouseEventMixin, self).__init__(parent)
         self.__download_keyword = download_keyword
         self.__dirname = dirname
-        self.__is_selenium = is_selenium
         self.__progress_bar = None
         self.__downloader = Downloader(self.progress_download_callback)
         self.__progress_download.connect(self.on_progress_download)
@@ -87,10 +87,10 @@ class DownloadWidget(MouseEventMixin, QWidget):
         self.__progress_bar = pbar
 
     def start_download(self):
-        def inner(keyword):
-            self.__downloader.download_image(keyword, DOUNLOAD_COUNT, self.__dirname, MIN_SIZE, self.__is_selenium)
+        def _inner(keyword):
+            self.__downloader.download_images(keyword, DOUNLOAD_COUNT, self.__dirname, MIN_SIZE)
             self.complete_progress.emit()
-        th = threading.Thread(target=inner, args=(self.__download_keyword, ))
+        th = Thread(target=_inner, args=(self.__download_keyword, ))
         th.setDaemon(True)
         th.start()
 
@@ -120,8 +120,7 @@ class ImageView(MouseEventMixin, QGraphicsView):
         self.__timer.timeout.connect(self.on_timeout)
 
     def init_image_list(self):
-        self.__image_list = [x for x in os.listdir(
-            self.__dirname) if os.path.isfile(os.path.join(self.__dirname, x))]
+        self.__image_list = [str(x) for x in Path(self.__dirname).iterdir() if x.is_file()]
 
     def start_view(self):
         self.init_image_list()
@@ -140,7 +139,7 @@ class ImageView(MouseEventMixin, QGraphicsView):
             return
         image = random.choice(self.__image_list)
         self.__image_list.remove(image)
-        self.set_image(os.path.join(self.__dirname, image))
+        self.set_image(path.join(self.__dirname, image))
 
     def on_timeout(self):
         if not self.__image_list:
@@ -160,12 +159,10 @@ class ImageView(MouseEventMixin, QGraphicsView):
         view_aspect_ratio = self.width() / self.height()
         if view_aspect_ratio <= image_aspect_ratio:
             image_height = self.width() / image_aspect_ratio
-            rect = QRectF(0, (self.height() - image_height) /
-                          2, self.width(), image_height)
+            rect = QRectF(0, (self.height() - image_height) / 2, self.width(), image_height)
         else:
             image_widh = self.height() * image_aspect_ratio
-            rect = QRectF((self.width() - image_widh) /
-                          2, 0, image_widh, self.height())
+            rect = QRectF((self.width() - image_widh) / 2, 0, image_widh, self.height())
 
         painter = QPainter(self.viewport())
         painter.drawImage(rect, self.__image)
@@ -173,9 +170,8 @@ class ImageView(MouseEventMixin, QGraphicsView):
 
 
 class MainWindow(QWidget):
-    def __init__(self, download_keyword, dirname, is_selenium=False, parent=None):
-        super(MainWindow, self).__init__(
-            parent, Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
+    def __init__(self, download_keyword, dirname, parent=None):
+        super(MainWindow, self).__init__(parent, Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
         self.__dirname = dirname
         self.__download_widget = None
         self.__image_view = None
@@ -184,7 +180,7 @@ class MainWindow(QWidget):
 
         self.init_common_ui()
         if download_keyword:
-            self.init_download_ui(download_keyword, is_selenium)
+            self.init_download_ui(download_keyword)
             self.__download_widget.start_download()
         else:
             self.init_image_ui()
@@ -193,7 +189,7 @@ class MainWindow(QWidget):
     def init_common_ui(self):
         height = QDesktopWidget().height() // 5
         self.resize(height * 5 // 3, height)
-        self.setWindowTitle("cappuccino")
+        self.setWindowTitle('cappuccino')
 
         vbox = QVBoxLayout(self)
         vbox.setContentsMargins(QMargins(0, 0, 0, 0))
@@ -203,8 +199,8 @@ class MainWindow(QWidget):
 
     def init_menu(self):
         def _inner_clear():
-            result = QMessageBox.question(self, self.windowTitle(
-            ), 'Delete all image ?', QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
+            result = QMessageBox.question(self, self.windowTitle(), 'Delete all image ?',
+                                          QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
             if result == QMessageBox.Ok:
                 shutil.rmtree(self.__dirname)
 
@@ -212,11 +208,9 @@ class MainWindow(QWidget):
 
         def _inner_toggle(state):
             if state:
-                _window.setWindowFlags(
-                    _window.windowFlags() | Qt.WindowStaysOnTopHint)
+                _window.setWindowFlags(_window.windowFlags() | Qt.WindowStaysOnTopHint)
             else:
-                _window.setWindowFlags(
-                    _window.windowFlags() & ~Qt.WindowStaysOnTopHint)
+                _window.setWindowFlags(_window.windowFlags() & ~Qt.WindowStaysOnTopHint)
             _window.show()
 
         top = QAction('&Top', self, checkable=True)
@@ -233,25 +227,20 @@ class MainWindow(QWidget):
         self.__menu.addAction(clear)
         self.__menu.addAction(exit_)
 
-    def init_download_ui(self, download_keyword, is_selenium):
-        self.__download_widget = DownloadWidget(download_keyword, self.__dirname, is_selenium, self)
+    def init_download_ui(self, download_keyword):
+        self.__download_widget = DownloadWidget(download_keyword, self.__dirname, self)
 
         layout = self.layout()
         layout.removeWidget(self.__image_view)
         layout.addWidget(self.__download_widget)
 
-        self.__download_widget.mouse_left_press.connect(
-            self.on_mouse_left_press)
+        self.__download_widget.mouse_left_press.connect(self.on_mouse_left_press)
         self.__download_widget.mouse_left_move.connect(self.on_mouse_left_move)
-        self.__download_widget.mouse_left_release.connect(
-            self.on_mouse_left_release)
-        self.__download_widget.mouse_left_double_click.connect(
-            self.on_mouse_left_double_click)
-        self.__download_widget.complete_progress.connect(
-            self.on_complete_progress)
+        self.__download_widget.mouse_left_release.connect(self.on_mouse_left_release)
+        self.__download_widget.mouse_left_double_click.connect(self.on_mouse_left_double_click)
+        self.__download_widget.complete_progress.connect(self.on_complete_progress)
         self.__download_widget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.__download_widget.customContextMenuRequested.connect(
-            self.on_context_menu_requested)
+        self.__download_widget.customContextMenuRequested.connect(self.on_context_menu_requested)
 
     def init_image_ui(self):
         self.__image_view = ImageView(self.__dirname, self)
@@ -262,21 +251,17 @@ class MainWindow(QWidget):
 
         self.__image_view.mouse_left_press.connect(self.on_mouse_left_press)
         self.__image_view.mouse_left_move.connect(self.on_mouse_left_move)
-        self.__image_view.mouse_left_release.connect(
-            self.on_mouse_left_release)
-        self.__image_view.mouse_left_double_click.connect(
-            self.on_mouse_left_double_click)
+        self.__image_view.mouse_left_release.connect(self.on_mouse_left_release)
+        self.__image_view.mouse_left_double_click.connect(self.on_mouse_left_double_click)
         self.__image_view.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.__image_view.customContextMenuRequested.connect(
-            self.on_context_menu_requested)
+        self.__image_view.customContextMenuRequested.connect(self.on_context_menu_requested)
 
     def on_complete_progress(self):
         self.init_image_ui()
         self.__image_view.start_view()
 
     def on_mouse_left_press(self, gpos):
-        self.__mouse_left_press_pos = self.mapFromGlobal(
-            gpos) - self.mapFromGlobal(self.pos())
+        self.__mouse_left_press_pos = self.mapFromGlobal(gpos) - self.mapFromGlobal(self.pos())
 
     def on_mouse_left_move(self, gpos):
         if not self.__mouse_left_press_pos:
@@ -295,25 +280,23 @@ class MainWindow(QWidget):
 
 def resource_path(relative):
     if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative)
-    return os.path.join(relative)
+        return path.join(sys._MEIPASS, relative)
+    return path.join(relative)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='cappuccino')
-    parser.add_argument('download_keyword', nargs='?',
-                        default='', help='image keyword to download')
-    parser.add_argument('-s', '--selenium', action='store_true',
-                        help='download by selenium')
+    parser = ArgumentParser(description='cappuccino')
+    parser.add_argument('download_keyword', nargs='?', default='', help='image keyword to download')
     args = parser.parse_args()
 
     download_keyword = args.download_keyword
-    if not download_keyword and (not os.path.isdir(DIR_NAME) or not [x for x in os.listdir(DIR_NAME) if os.path.isfile(os.path.join(DIR_NAME, x))]):
+    if not download_keyword and (not path.isdir(DIR_NAME)
+                                 or not [str(x) for x in Path(DIR_NAME).iterdir() if x.is_file()]):
         download_keyword = DEFAULT_KEYWORD
 
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(resource_path('cappuccino.ico')))
-    window = MainWindow(download_keyword, DIR_NAME, args.selenium)
+    window = MainWindow(download_keyword, DIR_NAME)
     window.show()
     sys.exit(app.exec())
 
