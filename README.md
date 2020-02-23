@@ -7,7 +7,6 @@ Simple image viewer with download
 * beautifulsoup4
 * OpenCV
 * PyQt5
-* Selenium
 
 # Initialize (Pipenv)
 
@@ -21,11 +20,11 @@ $ pipenv sync --dev
 ## Download image and Display (by selenium)
 
 ```console
-$ pipenv run python cappuccino.py [-s] download_keyword
+$ pipenv run python cappuccino.py download_keyword
 ```
 
 ```console
-usage: cappuccino.py [-h] [-s] [download_keyword]
+usage: cappuccino.py [-h] [download_keyword]
 
 cappuccino
 
@@ -34,13 +33,7 @@ positional arguments:
 
 optional arguments:
   -h, --help        show this help message and exit
-  -s, --selenium    download by selenium
 ```
-
-### Selenium (Chrome)
-
-Save ChromeDriver to current directory  
-[https://sites.google.com/a/chromium.org/chromedriver/home](https://sites.google.com/a/chromium.org/chromedriver/home)
 
 ## Display of the downloaded image
 
