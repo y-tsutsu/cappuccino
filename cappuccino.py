@@ -88,7 +88,7 @@ class DownloadWidget(MouseEventMixin, QWidget):
 
     def start_download(self):
         def _inner(keyword):
-            self.__downloader.download_images(keyword, DOUNLOAD_COUNT, self.__dirname, MIN_SIZE)
+            self.__downloader.download_images(keyword, self.__dirname, DOUNLOAD_COUNT, MIN_SIZE)
             self.complete_progress.emit()
         th = Thread(target=_inner, args=(self.__download_keyword, ))
         th.setDaemon(True)

@@ -14,7 +14,7 @@ class Downloader():
         self.__progress_callback = progress_callback
         self.__headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.107 Safari/537.36'}
 
-    def download_images(self, keyword, download_num, dirname, minsize):
+    def download_images(self, keyword, dirname, download_num=100, minsize=(0, 0)):
         if path.isdir(dirname):
             shutil.rmtree(dirname)
             sleep(1)
