@@ -13,10 +13,10 @@ rope = "*"
 beautifulsoup4 = "*"
 opencv-python = "*"
 pyqt5 = "*"
-selenium = "*"
+requests = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
 
 [scripts]
 start = "python cappuccino.py"
