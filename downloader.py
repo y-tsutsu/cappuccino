@@ -56,6 +56,7 @@ class Downloader():
             murl = j['murl']
             _, ext = path.splitext(murl)
             if ext in extensions and murl not in downloaded_urls:
+                downloaded_urls.append(murl)
                 result.append(murl)
         return result
 
