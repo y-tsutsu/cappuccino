@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from cv2 import imread
 
 
-class Downloader():
+class Downloader:
     def __init__(self, progress_callback=None):
         self.__progress_callback = progress_callback
         self.__headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.107 Safari/537.36'}

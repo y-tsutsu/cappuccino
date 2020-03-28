@@ -25,7 +25,7 @@ DIR_NAME = path.join(path.abspath(path.dirname(sys.argv[0])), 'image')
 DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
 
-class MouseEventMixin():
+class MouseEventMixin:
     mouse_left_press = pyqtSignal(QPoint)
     mouse_left_move = pyqtSignal(QPoint)
     mouse_left_release = pyqtSignal(QPoint)
