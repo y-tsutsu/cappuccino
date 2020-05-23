@@ -88,6 +88,8 @@ class Downloader:
 
     def __check_size(self, filename, minsize):
         img = imread(filename)
+        if img is None:
+            return False, (0, 0)
         height, width, _ = img.shape
         result = True if minsize[0] <= width and minsize[1] <= height else False
-        return (result, (width, height))
+        return result, (width, height)
