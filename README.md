@@ -48,5 +48,5 @@ $ pipenv run python cappuccino.py
 ```console
 $ pipenv run build
 or
-$ pipenv run pyinstaller cappuccino.py --onefile --noconsole --clean
+$ pipenv run pyinstaller cappuccino.py --onefile --noconsole --clean --icon=cappuccino.ico
 ```
