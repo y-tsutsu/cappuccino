@@ -128,11 +128,10 @@ class ImageView(MouseEventMixin, QGraphicsView):
         self.__timer.start()
 
     def set_image(self, filename):
-        self.__image = QImage(filename)
-        # ステータスを書き換えないとrepaint()が効かなかった対策．もっとまともな手はないか．．．
         self.setUpdatesEnabled(False)
-        self.setUpdatesEnabled(True)
+        self.__image = QImage(filename)
         self.repaint()
+        self.setUpdatesEnabled(True)
 
     def random_set_image(self):
         if not self.__image_list:
