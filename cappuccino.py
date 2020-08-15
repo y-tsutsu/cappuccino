@@ -20,7 +20,7 @@ MIN_SIZE = (300, 300)
 
 IMAGE_INTERVAL = 20000
 
-DIR_NAME = path.join(path.abspath(path.dirname(sys.argv[0])), 'image')
+DIR_NAME = path.join(path.abspath(path.dirname(sys.argv[0])), 'images')
 
 DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
