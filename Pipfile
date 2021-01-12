@@ -12,7 +12,7 @@ rope = "*"
 [packages]
 beautifulsoup4 = "*"
 opencv-python = "*"
-pyqt5 = "*"
+pyside2 = "*"
 requests = "*"
 
 [requires]

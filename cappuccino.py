@@ -6,11 +6,11 @@ from os import path
 from pathlib import Path
 from threading import Thread
 
-from PyQt5.QtCore import QMargins, QPoint, QRectF, Qt, QTimer, pyqtSignal
-from PyQt5.QtGui import QIcon, QImage, QMouseEvent, QPainter
-from PyQt5.QtWidgets import (QAction, QApplication, QDesktopWidget,
-                             QGraphicsView, QLabel, QMenu, QMessageBox,
-                             QProgressBar, QVBoxLayout, QWidget)
+from PySide2.QtCore import QMargins, QPoint, QRectF, Qt, QTimer, Signal
+from PySide2.QtGui import QIcon, QImage, QMouseEvent, QPainter
+from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget,
+                               QGraphicsView, QLabel, QMenu, QMessageBox,
+                               QProgressBar, QVBoxLayout, QWidget)
 
 from downloader import Downloader
 
@@ -26,10 +26,13 @@ DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
 
 class MouseEventMixin:
-    mouse_left_press = pyqtSignal(QPoint)
-    mouse_left_move = pyqtSignal(QPoint)
-    mouse_left_release = pyqtSignal(QPoint)
-    mouse_left_double_click = pyqtSignal(QMouseEvent)
+    mouse_left_press = Signal(QPoint)
+    mouse_left_move = Signal(QPoint)
+    mouse_left_release = Signal(QPoint)
+    mouse_left_double_click = Signal(QMouseEvent)
+
+    def __init__(self):
+        pass
 
     def mousePressEvent(self, event):
         super(MouseEventMixin, self).mousePressEvent(event)
@@ -56,8 +59,8 @@ class MouseEventMixin:
 
 
 class DownloadWidget(MouseEventMixin, QWidget):
-    __progress_download = pyqtSignal(int)
-    complete_progress = pyqtSignal()
+    __progress_download = Signal(int)
+    complete_progress = Signal()
 
     def __init__(self, download_keyword, dirname, parent=None):
         super(DownloadWidget, self).__init__()
@@ -274,7 +277,7 @@ class MainWindow(QWidget):
         self.setWindowState(Qt.WindowMinimized)
 
     def on_context_menu_requested(self, pos):
-        self.__menu.exec(self.mapToGlobal(pos))
+        self.__menu.exec_(self.mapToGlobal(pos))
 
 
 def resource_path(relative):
@@ -297,7 +300,7 @@ def main():
     app.setWindowIcon(QIcon(resource_path('cappuccino.ico')))
     window = MainWindow(download_keyword, DIR_NAME)
     window.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
