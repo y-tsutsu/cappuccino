@@ -1,6 +1,7 @@
 import QtQuick 2.12
-import QtQuick.Window 2.12
-import QtQuick.Controls 2.12
+import QtQuick.Window 2.14
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.0
 import QtQuick.Controls.Material 2.12
 
 ApplicationWindow {
@@ -19,30 +20,28 @@ ApplicationWindow {
         visible: true
         anchors.fill: parent
 
-        Control {
-            id: downloaderControl
+        ColumnLayout {
             width: parent.width
             height: 60
+            spacing: 20
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
 
             Label {
                 id: downloaderLabel
                 text: qsTr("カプチーノを入れています．．．")
-                anchors.top: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
                 font.family: "Yu Gothic UI"
                 font.pointSize: 16
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
             ProgressBar {
                 id: downloaderProgressBar
-                width: parent.width * 0.8
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
                 value: 0.5
+                Layout.fillWidth: true
+                Layout.rightMargin: 20
+                Layout.leftMargin: 20
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
         }
     }
