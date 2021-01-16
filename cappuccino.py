@@ -27,7 +27,7 @@ def main():
     app.setWindowIcon(QIcon(resource_path('cappuccino.ico')))
 
     engine = QQmlApplicationEngine()
-    engine.load(path.join(path.dirname(sys.argv[0]), resource_path('qml/main.qml')))
+    engine.load(path.join(path.dirname(sys.argv[0]), resource_path('qml/Main.qml')))
 
     if not engine.rootObjects():
         sys.exit(-1)
