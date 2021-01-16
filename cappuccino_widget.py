@@ -292,8 +292,8 @@ def main():
     args = parser.parse_args()
 
     download_keyword = args.download_keyword
-    if not download_keyword and (not path.isdir(DIR_NAME)
-                                 or not [str(x) for x in Path(DIR_NAME).iterdir() if x.is_file()]):
+    if not download_keyword and (not path.isdir(DIR_NAME) or
+                                 not [str(x) for x in Path(DIR_NAME).iterdir() if x.is_file()]):
         download_keyword = DEFAULT_KEYWORD
 
     app = QApplication(sys.argv)

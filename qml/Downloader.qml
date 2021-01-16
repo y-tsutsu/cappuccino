@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 Item {
-    id: downloader
+    id: item
     visible: true
     anchors.fill: parent
 
@@ -15,7 +15,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
 
         Label {
-            id: downloaderLabel
+            id: label
             text: qsTr("カプチーノを入れています．．．")
             font.family: "Yu Gothic UI"
             font.pointSize: 13
@@ -23,12 +23,18 @@ Item {
         }
 
         ProgressBar {
-            id: downloaderProgressBar
-            value: 0.5
+            id: progress_bar
+            value: dmodel.prog_value
+            from: 0
+            to: dmodel.prog_max
             Layout.fillWidth: true
             Layout.rightMargin: 20
             Layout.leftMargin: 20
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         }
+    }
+
+    Component.onCompleted: {
+        dmodel.start_download()
     }
 }
