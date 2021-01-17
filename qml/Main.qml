@@ -93,6 +93,7 @@ ApplicationWindow {
         MenuItem {
             text: "EXIT"
             onTriggered: {
+                // QtのBugのようだが先にBindingを切らないとエラーになる
                 viewer.release()
                 window.release()
                 window.close()
@@ -156,6 +157,6 @@ ApplicationWindow {
     }
 
     function release() {
-        window.isDownload = null    // QtのBugのようだが先にBindingを切らないとエラーになる
+        window.isDownload = null
     }
 }

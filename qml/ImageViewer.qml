@@ -21,6 +21,6 @@ Item {
     }
 
     function release() {
-        image_url = null    // QtのBugのようだが先にBindingを切らないとエラーになる
+        image_url = null
     }
 }
