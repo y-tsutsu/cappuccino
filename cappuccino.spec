@@ -16,6 +16,7 @@ a = Analysis(['cappuccino.py'],
              cipher=block_cipher,
              noarchive=False)
 a.datas += [('cappuccino.ico', '.\\cappuccino.ico', 'Data')]
+a.datas += Tree('qml', '.\\qml', 'Data')
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
