@@ -6,7 +6,9 @@ from os import path
 from pathlib import Path
 from threading import Thread
 
+from PySide2 import __version__ as PySideVer
 from PySide2.QtCore import QMargins, QPoint, QRectF, Qt, QTimer, Signal
+from PySide2.QtCore import __version__ as QtVer
 from PySide2.QtGui import QIcon, QImage, QMouseEvent, QPainter
 from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget,
                                QGraphicsView, QLabel, QMenu, QMessageBox,
@@ -90,10 +92,10 @@ class DownloadWidget(MouseEventMixin, QWidget):
         self.__progress_bar = pbar
 
     def start_download(self):
-        def _inner(keyword):
-            self.__downloader.download_images(keyword, self.__dirname, DOUNLOAD_COUNT, MIN_SIZE)
+        def _inner(keyword, dirname):
+            self.__downloader.download_images(keyword, dirname, DOUNLOAD_COUNT, MIN_SIZE)
             self.complete_progress.emit()
-        th = Thread(target=_inner, args=(self.__download_keyword, ))
+        th = Thread(target=_inner, args=(self.__download_keyword, self.__dirname))
         th.setDaemon(True)
         th.start()
 
@@ -280,6 +282,10 @@ class MainWindow(QWidget):
         self.__menu.exec_(self.mapToGlobal(pos))
 
 
+def exist_images():
+    return path.isdir(DIR_NAME) and any([x.is_file() for x in Path(DIR_NAME).iterdir()])
+
+
 def resource_path(relative):
     if hasattr(sys, '_MEIPASS'):
         return path.join(sys._MEIPASS, relative)
@@ -287,13 +293,14 @@ def resource_path(relative):
 
 
 def main():
+    print(f'PySide2=={PySideVer} Qt=={QtVer}')
+
     parser = ArgumentParser(description='cappuccino')
     parser.add_argument('download_keyword', nargs='?', default='', help='image keyword to download')
     args = parser.parse_args()
 
     download_keyword = args.download_keyword
-    if not download_keyword and (not path.isdir(DIR_NAME) or
-                                 not [str(x) for x in Path(DIR_NAME).iterdir() if x.is_file()]):
+    if not download_keyword and not exist_images():
         download_keyword = DEFAULT_KEYWORD
 
     app = QApplication(sys.argv)

@@ -20,6 +20,7 @@ python_version = "3.9"
 
 [scripts]
 start = "python cappuccino.py"
+startwidget = "python cappuccino_widget.py"
 build = "pyinstaller.exe cappuccino.spec"
 clean = "rm -rf build/ dist/cappuccino.exe"
 lint = "flake8 --statistics --show-source ./"
