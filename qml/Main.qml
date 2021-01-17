@@ -25,9 +25,47 @@ ApplicationWindow {
         onAccepted: mmodel.clear()
     }
 
+    Menu {
+        id: menu
+
+        MenuItem {
+            text: "TOP"
+            checkable: true
+            checked: true
+            onTriggered: {
+                if (checked) {
+                    window.flags |= Qt.WindowStaysOnTopHint
+                } else {
+                    window.flags &= ~Qt.WindowStaysOnTopHint
+                }
+            }
+        }
+
+        MenuItem {
+            text: "HIDE"
+            onTriggered: window.showMinimized()
+        }
+
+        MenuItem {
+            text: "CLEAR"
+            onTriggered: {
+                message_dialog.show()
+            }
+        }
+
+        MenuItem {
+            text: "EXIT"
+            onTriggered: window.close()
+        }
+    }
+
     MouseArea {
+        id: marea
+
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        property point pressPoint: Qt.point(0, 0)
 
         onClicked: {
             if (mouse.button === Qt.RightButton) {
@@ -41,37 +79,28 @@ ApplicationWindow {
             }
         }
 
-        Menu {
-            id: menu
-
-            MenuItem {
-                text: "Top"
-                checkable: true
-                checked: true
-                onTriggered: {
-                    if (checked) {
-                        window.flags |= Qt.WindowStaysOnTopHint
-                    } else {
-                        window.flags &= ~Qt.WindowStaysOnTopHint
-                    }
-                }
+        onDoubleClicked: {
+            if (mouse.button === Qt.LeftButton) {
+                window.showMinimized()
             }
+        }
 
-            MenuItem {
-                text: "Hide"
-                onTriggered: window.showMinimized()
+        onPressed: {
+            if (mouse.button === Qt.LeftButton) {
+                marea.pressPoint = Qt.point(mouse.x, mouse.y)
             }
+        }
 
-            MenuItem {
-                text: "Clear"
-                onTriggered: {
-                    message_dialog.show()
-                }
-            }
+        onPositionChanged: {
+            var gpos = mapToGlobal(mouse.x, mouse.y)
+            var mpos = Qt.point(gpos.x - marea.pressPoint.x, gpos.y - marea.pressPoint.y)
+            window.setX(mpos.x)
+            window.setY(mpos.y)
+        }
 
-            MenuItem {
-                text: "Exit"
-                onTriggered: window.close()
+        onReleased: {
+            if (mouse.button === Qt.LeftButton) {
+                marea.pressPoint = Qt.point(0, 0)
             }
         }
     }
