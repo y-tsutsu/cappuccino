@@ -8,7 +8,7 @@ ApplicationWindow {
     visible: false
     minimumWidth: 250
     minimumHeight: 150
-    title: qsTr("Hello World")
+    title: qsTr("cappuccino")
     flags: Qt.Window | Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint
 
     Material.theme: Material.Light
@@ -16,6 +16,64 @@ ApplicationWindow {
 
     Downloader {
         id: downloader
+    }
+
+    MessageDialog {
+        id: message_dialog
+        title: window.title
+        message: qsTr("Delete all image ?")
+        onAccepted: mmodel.clear()
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+        onClicked: {
+            if (mouse.button === Qt.RightButton) {
+                menu.popup(mouse.x, mouse.y)
+            }
+        }
+
+        onPressAndHold: {
+            if (mouse.source === Qt.MouseEventNotSynthesized) {
+                menu.popup(mouse.x, mouse.y)
+            }
+        }
+
+        Menu {
+            id: menu
+
+            MenuItem {
+                text: "Top"
+                checkable: true
+                checked: true
+                onTriggered: {
+                    if (checked) {
+                        window.flags |= Qt.WindowStaysOnTopHint
+                    } else {
+                        window.flags &= ~Qt.WindowStaysOnTopHint
+                    }
+                }
+            }
+
+            MenuItem {
+                text: "Hide"
+                onTriggered: window.showMinimized()
+            }
+
+            MenuItem {
+                text: "Clear"
+                onTriggered: {
+                    message_dialog.show()
+                }
+            }
+
+            MenuItem {
+                text: "Exit"
+                onTriggered: window.close()
+            }
+        }
     }
 
     Component.onCompleted: {

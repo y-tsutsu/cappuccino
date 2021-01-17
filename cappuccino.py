@@ -1,3 +1,4 @@
+import shutil
 import sys
 from argparse import ArgumentParser
 from os import path
@@ -19,9 +20,19 @@ MIN_SIZE = (300, 300)
 
 IMAGE_INTERVAL = 20000
 
-DIR_NAME = path.join(path.abspath(path.dirname(sys.argv[0])), 'images')
+IMAGES_DIR_NAME = path.join(path.abspath(path.dirname(sys.argv[0])), 'images')
 
 DEFAULT_KEYWORD = '女性ヘアカタログロング'
+
+
+class MainModel(QObject):
+    def __init__(self, dirname, parent=None):
+        super().__init__(parent)
+        self.__dirname = dirname
+
+    @Slot()
+    def clear(self):
+        shutil.rmtree(self.__dirname)
 
 
 class DownloaderModel(QObject):
@@ -64,7 +75,7 @@ class DownloaderModel(QObject):
 
 
 def exist_images():
-    return path.isdir(DIR_NAME) and any([x.is_file() for x in Path(DIR_NAME).iterdir()])
+    return path.isdir(IMAGES_DIR_NAME) and any([x.is_file() for x in Path(IMAGES_DIR_NAME).iterdir()])
 
 
 def init_qt():
@@ -98,7 +109,9 @@ def main():
     app.setWindowIcon(QIcon(resource_path('cappuccino.ico')))
 
     engine = QQmlApplicationEngine()
-    dmodel = DownloaderModel(download_keyword, DIR_NAME)
+    mmodel = MainModel(IMAGES_DIR_NAME)
+    dmodel = DownloaderModel(download_keyword, IMAGES_DIR_NAME)
+    engine.rootContext().setContextProperty('mmodel', mmodel)
     engine.rootContext().setContextProperty('dmodel', dmodel)
     engine.load(path.join(path.abspath(path.dirname(sys.argv[0])), resource_path('qml/Main.qml')))
 

@@ -22,7 +22,7 @@ MIN_SIZE = (300, 300)
 
 IMAGE_INTERVAL = 20000
 
-DIR_NAME = path.join(path.abspath(path.dirname(sys.argv[0])), 'images')
+IMAGES_DIR_NAME = path.join(path.abspath(path.dirname(sys.argv[0])), 'images')
 
 DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
@@ -283,7 +283,7 @@ class MainWindow(QWidget):
 
 
 def exist_images():
-    return path.isdir(DIR_NAME) and any([x.is_file() for x in Path(DIR_NAME).iterdir()])
+    return path.isdir(IMAGES_DIR_NAME) and any([x.is_file() for x in Path(IMAGES_DIR_NAME).iterdir()])
 
 
 def resource_path(relative):
@@ -305,7 +305,7 @@ def main():
 
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(resource_path('cappuccino.ico')))
-    window = MainWindow(download_keyword, DIR_NAME)
+    window = MainWindow(download_keyword, IMAGES_DIR_NAME)
     window.show()
     sys.exit(app.exec_())
 
