@@ -4,21 +4,17 @@ import QtQuick.Controls 2.0
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.0
 
-ApplicationWindow {
-    id: window
+ToolTip {
+    id: tool_tip
 
     signal accepted()
     property alias message: label.text
 
     width: 250
     height: 150
-    minimumHeight: height
-    maximumHeight: height
-    minimumWidth: width
-    maximumWidth: width
-
-    visible: false
-    flags: Qt.Tool
+    modal: true
+    focus: true
+    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
     ColumnLayout {
         anchors.fill: parent
@@ -41,7 +37,7 @@ ApplicationWindow {
                 id: button
                 text: qsTr("CANCEL")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                onClicked: window.close()
+                onClicked: tool_tip.close()
             }
 
             Button {
@@ -49,15 +45,16 @@ ApplicationWindow {
                 text: qsTr("OK")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 onClicked: {
-                    window.accepted()
-                    window.close()
+                    tool_tip.accepted()
+                    tool_tip.close()
                 }
             }
         }
     }
 
-    function show() {
-        window.visible = true
-        window.requestActivate()
+    function show(parentSize) {
+        tool_tip.x = (parentSize.width - tool_tip.width) / 2
+        tool_tip.y = (parentSize.height - tool_tip.height) / 2
+        tool_tip.visible = true
     }
 }

@@ -18,9 +18,8 @@ ApplicationWindow {
         id: downloader
     }
 
-    MessageDialog {
-        id: message_dialog
-        title: window.title
+    MessageToolTip {
+        id: message
         message: qsTr("Delete all image ?")
         onAccepted: mmodel.clear()
     }
@@ -49,7 +48,7 @@ ApplicationWindow {
         MenuItem {
             text: "CLEAR"
             onTriggered: {
-                message_dialog.show()
+                message.show(Qt.size(window.width, window.height))
             }
         }
 
