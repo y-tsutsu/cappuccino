@@ -12,7 +12,7 @@ ApplicationWindow {
     flags: Qt.Window | Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint
 
     Material.theme: Material.Light
-    Material.accent: Material.Purple
+    Material.accent: Material.Blue
 
     property bool isDownload: mmodel.is_download
 
