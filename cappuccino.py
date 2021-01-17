@@ -26,19 +26,35 @@ DEFAULT_KEYWORD = '女性ヘアカタログロング'
 
 
 class MainModel(QObject):
-    def __init__(self, dirname, parent=None):
+    is_download_changed = Signal(bool)
+
+    def __init__(self, is_download, dirname, parent=None):
         super().__init__(parent)
+        self.__is_download = is_download
         self.__dirname = dirname
+
+    @Property(bool, notify=is_download_changed)
+    def is_download(self):
+        return self.__is_download
+
+    @is_download.setter
+    def is_download(self, value):
+        if self.__is_download != value:
+            self.__is_download = value
+            self.is_download_changed.emit(self.__is_download)
 
     @Slot()
     def clear(self):
         shutil.rmtree(self.__dirname)
 
+    def on_complete_download(self):
+        self.is_download = False
+
 
 class DownloaderModel(QObject):
     prog_value_changed = Signal(int)
     prog_max_changed = Signal(int)
-    complete_progress = Signal()
+    complete_download = Signal()
 
     def __init__(self, download_keyword, dirname, parent=None):
         super().__init__(parent)
@@ -65,7 +81,7 @@ class DownloaderModel(QObject):
     def start_download(self):
         def _inner(keyword, dirname):
             self.__downloader.download_images(keyword, dirname, DOUNLOAD_COUNT, MIN_SIZE)
-            self.complete_progress.emit()
+            self.complete_download.emit()
         th = Thread(target=_inner, args=(self.__download_keyword, self.__dirname))
         th.setDaemon(True)
         th.start()
@@ -78,7 +94,7 @@ def exist_images():
     return path.isdir(IMAGES_DIR_NAME) and any([x.is_file() for x in Path(IMAGES_DIR_NAME).iterdir()])
 
 
-def init_qt():
+def initialize_qt():
     sys.argv += ['--style', 'material']
 
     QGuiApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
@@ -103,14 +119,17 @@ def main():
     if not download_keyword and not exist_images():
         download_keyword = DEFAULT_KEYWORD
 
-    init_qt()
+    initialize_qt()
 
     app = QGuiApplication(sys.argv)
     app.setWindowIcon(QIcon(resource_path('cappuccino.ico')))
 
-    engine = QQmlApplicationEngine()
-    mmodel = MainModel(IMAGES_DIR_NAME)
+    is_download = download_keyword != ''
+    mmodel = MainModel(is_download, IMAGES_DIR_NAME)
     dmodel = DownloaderModel(download_keyword, IMAGES_DIR_NAME)
+    dmodel.complete_download.connect(mmodel.on_complete_download)
+
+    engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty('mmodel', mmodel)
     engine.rootContext().setContextProperty('dmodel', dmodel)
     engine.load(path.join(path.abspath(path.dirname(sys.argv[0])), resource_path('qml/Main.qml')))

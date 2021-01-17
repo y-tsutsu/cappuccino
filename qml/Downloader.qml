@@ -4,7 +4,6 @@ import QtQuick.Layouts 1.15
 
 Item {
     id: item
-    visible: true
     anchors.fill: parent
 
     ColumnLayout {
@@ -34,7 +33,9 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        dmodel.start_download()
+    onVisibleChanged: {
+        if (item.visible) {
+            dmodel.start_download()
+        }
     }
 }

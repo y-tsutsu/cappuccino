@@ -14,8 +14,46 @@ ApplicationWindow {
     Material.theme: Material.Light
     Material.accent: Material.Purple
 
-    Downloader {
-        id: downloader
+    property bool isDownload: mmodel.is_download
+
+    Item {
+        id: item
+        anchors.fill: parent
+
+        Downloader {
+            id: downloader
+            visible: false
+        }
+
+        ImageViewer {
+            id: viewer
+            visible: true
+        }
+
+        states: [
+            State {
+                when: window.isDownload
+                PropertyChanges {
+                    target: downloader
+                    visible: true
+                }
+                PropertyChanges {
+                    target: viewer
+                    visible: false
+                }
+            },
+            State {
+                when: !window.isDownload
+                PropertyChanges {
+                    target: downloader
+                    visible: false
+                }
+                PropertyChanges {
+                    target: viewer
+                    visible: true
+                }
+            }
+        ]
     }
 
     MessageToolTip {
@@ -54,7 +92,10 @@ ApplicationWindow {
 
         MenuItem {
             text: "EXIT"
-            onTriggered: window.close()
+            onTriggered: {
+                window.isDownload = null    // QtのBugのようだが先にBindingを切らないとエラーになる
+                window.close()
+            }
         }
     }
 

@@ -62,7 +62,7 @@ class MouseEventMixin:
 
 class DownloadWidget(MouseEventMixin, QWidget):
     __progress_download = Signal(int)
-    complete_progress = Signal()
+    complete_download = Signal()
 
     def __init__(self, download_keyword, dirname, parent=None):
         super(DownloadWidget, self).__init__()
@@ -94,7 +94,7 @@ class DownloadWidget(MouseEventMixin, QWidget):
     def start_download(self):
         def _inner(keyword, dirname):
             self.__downloader.download_images(keyword, dirname, DOUNLOAD_COUNT, MIN_SIZE)
-            self.complete_progress.emit()
+            self.complete_download.emit()
         th = Thread(target=_inner, args=(self.__download_keyword, self.__dirname))
         th.setDaemon(True)
         th.start()
@@ -242,7 +242,7 @@ class MainWindow(QWidget):
         self.__download_widget.mouse_left_move.connect(self.on_mouse_left_move)
         self.__download_widget.mouse_left_release.connect(self.on_mouse_left_release)
         self.__download_widget.mouse_left_double_click.connect(self.on_mouse_left_double_click)
-        self.__download_widget.complete_progress.connect(self.on_complete_progress)
+        self.__download_widget.complete_download.connect(self.on_complete_download)
         self.__download_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.__download_widget.customContextMenuRequested.connect(self.on_context_menu_requested)
 
@@ -260,7 +260,7 @@ class MainWindow(QWidget):
         self.__image_view.setContextMenuPolicy(Qt.CustomContextMenu)
         self.__image_view.customContextMenuRequested.connect(self.on_context_menu_requested)
 
-    def on_complete_progress(self):
+    def on_complete_download(self):
         self.init_image_ui()
         self.__image_view.start_view()
 
