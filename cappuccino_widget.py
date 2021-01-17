@@ -112,8 +112,8 @@ class ImageView(MouseEventMixin, QGraphicsView):
         super(MouseEventMixin, self).__init__(parent)
         self.__dirname = dirname
         self.__image = None
+        self.__image_list = []
         self.__timer = QTimer(self)
-        self.__image_list = None
         self.init_ui()
 
     def init_ui(self):

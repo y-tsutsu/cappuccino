@@ -1,3 +1,4 @@
+import random
 import shutil
 import sys
 from argparse import ArgumentParser
@@ -6,8 +7,8 @@ from pathlib import Path
 from threading import Thread
 
 from PySide2 import __version__ as PySideVer
-from PySide2.QtCore import (Property, QCoreApplication, QObject, Qt, Signal,
-                            Slot)
+from PySide2.QtCore import (Property, QCoreApplication, QObject, Qt, QTimer,
+                            Signal, Slot)
 from PySide2.QtCore import __version__ as QtVer
 from PySide2.QtGui import QGuiApplication, QIcon
 from PySide2.QtQml import QQmlApplicationEngine
@@ -47,14 +48,14 @@ class MainModel(QObject):
     def clear(self):
         shutil.rmtree(self.__dirname)
 
-    def on_complete_download(self):
+    def on_download_completed(self):
         self.is_download = False
 
 
 class DownloaderModel(QObject):
     prog_value_changed = Signal(int)
     prog_max_changed = Signal(int)
-    complete_download = Signal()
+    download_completed = Signal()
 
     def __init__(self, download_keyword, dirname, parent=None):
         super().__init__(parent)
@@ -81,13 +82,58 @@ class DownloaderModel(QObject):
     def start_download(self):
         def _inner(keyword, dirname):
             self.__downloader.download_images(keyword, dirname, DOUNLOAD_COUNT, MIN_SIZE)
-            self.complete_download.emit()
+            self.download_completed.emit()
         th = Thread(target=_inner, args=(self.__download_keyword, self.__dirname))
         th.setDaemon(True)
         th.start()
 
     def progress_download_callback(self, progress):
         self.prog_value = progress
+
+
+class ImageViewerModel(QObject):
+    image_url_changed = Signal(str)
+
+    def __init__(self, dirname, parent=None):
+        super().__init__(parent)
+        self.__image_url = ''
+        self.__dirname = dirname
+        self.__image = None
+        self.__image_list = []
+        self.__timer = QTimer(self)
+        self.__timer.setInterval(IMAGE_INTERVAL)
+        self.__timer.timeout.connect(self.on_timeout)
+
+    @Property(str, notify=image_url_changed)
+    def image_url(self):
+        return self.__image_url
+
+    @image_url.setter
+    def image_url(self, value):
+        if self.__image_url != value:
+            self.__image_url = value
+            self.image_url_changed.emit(self.__image_url)
+
+    @Slot()
+    def start_view(self):
+        self.init_image_list()
+        self.random_set_image()
+        self.__timer.start()
+
+    def init_image_list(self):
+        self.__image_list = [str(x) for x in Path(self.__dirname).iterdir() if x.is_file()]
+
+    def random_set_image(self):
+        if not self.__image_list:
+            return
+        image = random.choice(self.__image_list)
+        self.__image_list.remove(image)
+        self.image_url = f'file:///{path.join(self.__dirname, image).replace(path.sep, "/")}'
+
+    def on_timeout(self):
+        if not self.__image_list:
+            self.initialize_image_list()
+        self.random_set_image()
 
 
 def exist_images():
@@ -127,11 +173,13 @@ def main():
     is_download = download_keyword != ''
     mmodel = MainModel(is_download, IMAGES_DIR_NAME)
     dmodel = DownloaderModel(download_keyword, IMAGES_DIR_NAME)
-    dmodel.complete_download.connect(mmodel.on_complete_download)
+    imodel = ImageViewerModel(IMAGES_DIR_NAME)
+    dmodel.download_completed.connect(mmodel.on_download_completed)
 
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty('mmodel', mmodel)
     engine.rootContext().setContextProperty('dmodel', dmodel)
+    engine.rootContext().setContextProperty('imodel', imodel)
     engine.load(path.join(path.abspath(path.dirname(sys.argv[0])), resource_path('qml/Main.qml')))
 
     if not engine.rootObjects():

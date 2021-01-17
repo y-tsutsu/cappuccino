@@ -27,7 +27,7 @@ ApplicationWindow {
 
         ImageViewer {
             id: viewer
-            visible: true
+            visible: false
         }
 
         states: [
@@ -93,7 +93,8 @@ ApplicationWindow {
         MenuItem {
             text: "EXIT"
             onTriggered: {
-                window.isDownload = null    // QtのBugのようだが先にBindingを切らないとエラーになる
+                viewer.release()
+                window.release()
                 window.close()
             }
         }
@@ -152,5 +153,9 @@ ApplicationWindow {
         setX(Screen.width / 2 - width / 2)
         setY(Screen.height / 2 - height / 2)
         setVisible(true)
+    }
+
+    function release() {
+        window.isDownload = null    // QtのBugのようだが先にBindingを切らないとエラーになる
     }
 }
