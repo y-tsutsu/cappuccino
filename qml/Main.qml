@@ -107,7 +107,8 @@ ApplicationWindow {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        property point pressPoint: Qt.point(0, 0)
+        readonly property point noneValue: Qt.point(-1, -1)
+        property point pressPoint: marea.noneValue
 
         onClicked: {
             if (mouse.button === Qt.RightButton) {
@@ -134,15 +135,18 @@ ApplicationWindow {
         }
 
         onPositionChanged: {
-            var gpos = mapToGlobal(mouse.x, mouse.y)
-            var mpos = Qt.point(gpos.x - marea.pressPoint.x, gpos.y - marea.pressPoint.y)
-            window.setX(mpos.x)
-            window.setY(mpos.y)
+            if (marea.pressPoint !== marea.noneValue)
+            {
+                var gpos = mapToGlobal(mouse.x, mouse.y)
+                var mpos = Qt.point(gpos.x - marea.pressPoint.x, gpos.y - marea.pressPoint.y)
+                window.setX(mpos.x)
+                window.setY(mpos.y)
+            }
         }
 
         onReleased: {
             if (mouse.button === Qt.LeftButton) {
-                marea.pressPoint = Qt.point(0, 0)
+                marea.pressPoint = marea.noneValue
             }
         }
     }
