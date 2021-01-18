@@ -28,20 +28,18 @@ ToolTip {
 
         RowLayout {
             id: rowLayout
-            width: 100
-            height: 100
             spacing: 20
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
             Button {
-                id: button
+                id: buttonCancel
                 text: qsTr("CANCEL")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 onClicked: tool_tip.close()
             }
 
             Button {
-                id: button1
+                id: buttonOk
                 text: qsTr("OK")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 onClicked: {

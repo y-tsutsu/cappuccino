@@ -58,7 +58,7 @@ ApplicationWindow {
 
     MessageToolTip {
         id: message
-        message: qsTr("Delete all image ?")
+        message: qsTr("Delete all images ?")
         onAccepted: mmodel.clear()
     }
 

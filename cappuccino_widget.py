@@ -203,7 +203,7 @@ class MainWindow(QWidget):
 
     def init_menu(self):
         def _inner_clear():
-            result = QMessageBox.question(self, self.windowTitle(), 'Delete all image ?',
+            result = QMessageBox.question(self, self.windowTitle(), 'Delete all images ?',
                                           QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
             if result == QMessageBox.Ok:
                 shutil.rmtree(self.__dirname)
