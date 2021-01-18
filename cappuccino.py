@@ -132,7 +132,7 @@ class ImageViewerModel(QObject):
 
     def on_timeout(self):
         if not self.__image_list:
-            self.initialize_image_list()
+            self.init_image_list()
         self.random_set_image()
 
 
