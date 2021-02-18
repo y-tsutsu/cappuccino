@@ -157,7 +157,7 @@ def resource_path(relative):
 def main():
     print(f'PySide2=={PySideVer} Qt=={QtVer}')
 
-    parser = ArgumentParser(description='cappuccino')
+    parser = ArgumentParser(description='cappuccino: Simple image viewer with download')
     parser.add_argument('download_keyword', nargs='?', default='', help='image keyword to download')
     args = parser.parse_args()
 
