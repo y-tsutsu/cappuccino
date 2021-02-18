@@ -98,7 +98,6 @@ class ImageViewerModel(QObject):
         super().__init__(parent)
         self.__image_url = ''
         self.__dirname = dirname
-        self.__image = None
         self.__image_list = []
         self.__timer = QTimer(self)
         self.__timer.setInterval(IMAGE_INTERVAL)
