@@ -17,7 +17,7 @@ $ pipenv sync --dev
 
 # How to
 
-## Download image and Display (by selenium)
+## Download image and Display
 
 ```console
 $ pipenv run python cappuccino.py download_keyword
