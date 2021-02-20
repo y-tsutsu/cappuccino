@@ -150,7 +150,7 @@ def initialize_qt():
 def resource_path(relative):
     if hasattr(sys, '_MEIPASS'):
         return path.join(sys._MEIPASS, relative)
-    return path.join(relative)
+    return path.join(path.abspath('.'), relative)
 
 
 def main():
@@ -179,7 +179,7 @@ def main():
     engine.rootContext().setContextProperty('mmodel', mmodel)
     engine.rootContext().setContextProperty('dmodel', dmodel)
     engine.rootContext().setContextProperty('imodel', imodel)
-    engine.load(path.join(path.abspath(path.dirname(sys.argv[0])), resource_path('qml/Main.qml')))
+    engine.load(resource_path('qml/Main.qml'))
 
     if not engine.rootObjects():
         sys.exit(-1)
