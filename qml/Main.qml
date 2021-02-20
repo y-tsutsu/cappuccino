@@ -66,7 +66,7 @@ ApplicationWindow {
         id: menu
 
         MenuItem {
-            text: "TOP"
+            text: qsTr("TOP")
             checkable: true
             checked: true
             onTriggered: {
@@ -79,19 +79,19 @@ ApplicationWindow {
         }
 
         MenuItem {
-            text: "HIDE"
+            text: qsTr("HIDE")
             onTriggered: window.showMinimized()
         }
 
         MenuItem {
-            text: "CLEAR"
+            text: qsTr("CLEAR")
             onTriggered: {
                 message.show(Qt.size(window.width, window.height))
             }
         }
 
         MenuItem {
-            text: "EXIT"
+            text: qsTr("EXIT")
             onTriggered: {
                 // QtのBugのようだが先にBindingを切らないとエラーになる
                 viewer.release()
