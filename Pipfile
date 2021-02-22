@@ -21,6 +21,7 @@ python_version = "3.9"
 [scripts]
 start = "python cappuccino.py"
 startwidget = "python cappuccino_widget.py"
+help = "python cappuccino.py -h"
 build = "pyinstaller.exe cappuccino.spec"
 clean = "rm -rf build/ dist/cappuccino.exe"
 format = "autopep8 -ivr ."
