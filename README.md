@@ -43,10 +43,10 @@ or
 $ pipenv run python cappuccino.py
 ```
 
-# Build by Pyinstaller
+# Build by PyInstaller
 
 ```console
 $ pipenv run build
 or
-$ pipenv run pyinstaller cappuccino.py --onefile --noconsole --clean --icon=cappuccino.ico
+$ pipenv run pyinstaller cappuccino.py --onefile --noconsole --clean --icon=cappuccino.ico --add-data ./cappuccino.ico;. --add-data ./qml/*;./qml/.
 ```
