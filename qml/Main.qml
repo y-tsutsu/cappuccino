@@ -1,7 +1,7 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQuick.Controls.Material
 
 ApplicationWindow {
     id: window
@@ -110,31 +110,31 @@ ApplicationWindow {
         readonly property point noneValue: Qt.point(-1, -1)
         property point pressPoint: marea.noneValue
 
-        onClicked: {
+        onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
                 menu.popup(mouse.x, mouse.y)
             }
         }
 
-        onPressAndHold: {
+        onPressAndHold: mouse => {
             if (mouse.source === Qt.MouseEventNotSynthesized) {
                 menu.popup(mouse.x, mouse.y)
             }
         }
 
-        onDoubleClicked: {
+        onDoubleClicked: mouse => {
             if (mouse.button === Qt.LeftButton) {
                 window.showMinimized()
             }
         }
 
-        onPressed: {
+        onPressed: mouse => {
             if (mouse.button === Qt.LeftButton) {
                 marea.pressPoint = Qt.point(mouse.x, mouse.y)
             }
         }
 
-        onPositionChanged: {
+        onPositionChanged: mouse => {
             if (marea.pressPoint !== marea.noneValue)
             {
                 var gpos = mapToGlobal(mouse.x, mouse.y)
@@ -144,7 +144,7 @@ ApplicationWindow {
             }
         }
 
-        onReleased: {
+        onReleased: mouse => {
             if (mouse.button === Qt.LeftButton) {
                 marea.pressPoint = marea.noneValue
             }

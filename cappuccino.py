@@ -6,12 +6,12 @@ from os import path
 from pathlib import Path
 from threading import Thread
 
-from PySide2 import __version__ as PySideVer
-from PySide2.QtCore import (Property, QCoreApplication, QObject, Qt, QTimer,
+from PySide6 import __version__ as PySideVer
+from PySide6.QtCore import (Property, QCoreApplication, QObject, Qt, QTimer,
                             Signal, Slot)
-from PySide2.QtCore import __version__ as QtVer
-from PySide2.QtGui import QGuiApplication, QIcon
-from PySide2.QtQml import QQmlApplicationEngine
+from PySide6.QtCore import __version__ as QtVer
+from PySide6.QtGui import QGuiApplication, QIcon
+from PySide6.QtQml import QQmlApplicationEngine
 
 from downloader import Downloader
 
@@ -140,7 +140,7 @@ def exist_images():
 
 
 def initialize_qt():
-    sys.argv += ['--style', 'material']
+    sys.argv += ['--style', 'Material']
 
     QGuiApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
@@ -154,7 +154,7 @@ def resource_path(relative):
 
 
 def main():
-    print(f'PySide2=={PySideVer} Qt=={QtVer}')
+    print(f'PySide6=={PySideVer} Qt=={QtVer}')
 
     parser = ArgumentParser(description='cappuccino: Simple image viewer with download')
     parser.add_argument('download_keyword', nargs='?', default='', help='image keyword to download')
@@ -179,11 +179,11 @@ def main():
     engine.rootContext().setContextProperty('mmodel', mmodel)
     engine.rootContext().setContextProperty('dmodel', dmodel)
     engine.rootContext().setContextProperty('imodel', imodel)
-    engine.load(resource_path('qml/Main.qml'))
+    engine.load(f'file:///{resource_path("qml/Main.qml")}')
 
     if not engine.rootObjects():
         sys.exit(-1)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':

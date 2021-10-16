@@ -6,13 +6,12 @@ from os import path
 from pathlib import Path
 from threading import Thread
 
-from PySide2 import __version__ as PySideVer
-from PySide2.QtCore import QMargins, QPoint, QRectF, Qt, QTimer, Signal
-from PySide2.QtCore import __version__ as QtVer
-from PySide2.QtGui import QIcon, QImage, QMouseEvent, QPainter
-from PySide2.QtWidgets import (QAction, QApplication, QDesktopWidget,
-                               QGraphicsView, QLabel, QMenu, QMessageBox,
-                               QProgressBar, QVBoxLayout, QWidget)
+from PySide6 import __version__ as PySideVer
+from PySide6.QtCore import QMargins, QPoint, QRectF, Qt, QTimer, Signal
+from PySide6.QtCore import __version__ as QtVer
+from PySide6.QtGui import QAction, QIcon, QImage, QMouseEvent, QPainter
+from PySide6.QtWidgets import (QApplication, QGraphicsView, QLabel, QMenu,
+                               QMessageBox, QProgressBar, QVBoxLayout, QWidget)
 
 from downloader import Downloader
 
@@ -39,19 +38,19 @@ class MouseEventMixin:
     def mousePressEvent(self, event):
         super(MouseEventMixin, self).mousePressEvent(event)
         if (event.button() == Qt.LeftButton):
-            pos = self.mapToGlobal(event.pos())
+            pos = event.globalPosition().toPoint()
             self.mouse_left_press.emit(pos)
 
     def mouseMoveEvent(self, event):
         super(MouseEventMixin, self).mouseMoveEvent(event)
         if (event.buttons() & Qt.LeftButton):
-            pos = self.mapToGlobal(event.pos())
+            pos = event.globalPosition().toPoint()
             self.mouse_left_move.emit(pos)
 
     def mouseReleaseEvent(self, event):
         super(MouseEventMixin, self).mouseReleaseEvent(event)
         if (event.button() == Qt.LeftButton):
-            pos = self.mapToGlobal(event.pos())
+            pos = event.globalPosition().toPoint()
             self.mouse_left_release.emit(pos)
 
     def mouseDoubleClickEvent(self, event):
@@ -191,7 +190,7 @@ class MainWindow(QWidget):
             self.__image_view.start_view()
 
     def init_common_ui(self):
-        height = QDesktopWidget().height() // 5
+        height = self.screen().size().height() // 5
         self.resize(height * 5 // 3, height)
         self.setWindowTitle('cappuccino')
 
@@ -250,7 +249,8 @@ class MainWindow(QWidget):
         self.__image_view = ImageView(self.__dirname, self)
 
         layout = self.layout()
-        layout.removeWidget(self.__download_widget)
+        if self.__download_widget:
+            layout.removeWidget(self.__download_widget)
         layout.addWidget(self.__image_view)
 
         self.__image_view.mouse_left_press.connect(self.on_mouse_left_press)
@@ -279,7 +279,7 @@ class MainWindow(QWidget):
         self.setWindowState(Qt.WindowMinimized)
 
     def on_context_menu_requested(self, pos):
-        self.__menu.exec_(self.mapToGlobal(pos))
+        self.__menu.exec(self.mapToGlobal(pos))
 
 
 def exist_images():
@@ -293,7 +293,7 @@ def resource_path(relative):
 
 
 def main():
-    print(f'PySide2=={PySideVer} Qt=={QtVer}')
+    print(f'PySide6=={PySideVer} Qt=={QtVer}')
 
     parser = ArgumentParser(description='cappuccino: Simple image viewer with download')
     parser.add_argument('download_keyword', nargs='?', default='', help='image keyword to download')
@@ -307,7 +307,7 @@ def main():
     app.setWindowIcon(QIcon(resource_path('cappuccino.ico')))
     window = MainWindow(download_keyword, IMAGES_DIR_NAME)
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':
