@@ -142,8 +142,6 @@ def exist_images():
 def initialize_qt():
     sys.argv += ['--style', 'Material']
 
-    QGuiApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-    QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
     QCoreApplication.setAttribute(Qt.AA_UseOpenGLES)
 
 

@@ -6,7 +6,7 @@ Simple image viewer with download
 
 * beautifulsoup4
 * OpenCV
-* PySide2
+* PySide6
 
 # Initialize (Pipenv)
 
