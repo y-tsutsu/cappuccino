@@ -6,8 +6,10 @@ verify_ssl = true
 [dev-packages]
 autopep8 = "*"
 flake8 = "*"
+nuitka = "*"
 pyinstaller = "*"
 rope = "*"
+zstandard = "*"
 
 [packages]
 beautifulsoup4 = "*"
@@ -22,8 +24,10 @@ python_version = "3.12"
 start = "python cappuccino.py"
 startwidget = "python cappuccino_widget.py"
 help = "python cappuccino.py -h"
-build = "pyinstaller cappuccino.spec"
-clean = "rm -rf build/ dist/cappuccino.exe"
+build-nuitka = "./nuitka_build.bat"
+build-pyins = "pyinstaller cappuccino.spec"
+clean-nuitka = "rm -rf cappuccino.build cappuccino.dist cappuccino.onefile-build cappuccino.exe"
+clean-pyins = "rm -rf build/ dist/cappuccino.exe"
 format = "autopep8 -ivr ."
 lint = "flake8 --show-source ."
 test = "python -m unittest discover -v"

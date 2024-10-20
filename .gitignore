@@ -140,4 +140,8 @@ cython_debug/
 images/
 build/
 dist/
+cappuccino.build/
+cappuccino.dist/
+cappuccino.onefile-build/
+cappuccino.exe
 .vscode/

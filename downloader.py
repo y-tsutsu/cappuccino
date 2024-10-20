@@ -3,10 +3,9 @@ import shutil
 from os import mkdir, path, remove
 from time import sleep
 
-from requests import get
-
 from bs4 import BeautifulSoup
 from cv2 import imread
+from requests import get
 
 
 class Downloader:

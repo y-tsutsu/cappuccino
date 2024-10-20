@@ -148,7 +148,7 @@ def initialize_qt():
 def resource_path(relative):
     if hasattr(sys, '_MEIPASS'):
         return path.join(sys._MEIPASS, relative)
-    return path.join(path.abspath('.'), relative)
+    return path.join(path.dirname(sys.modules['__main__'].__file__), relative)
 
 
 def main():
