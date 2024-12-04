@@ -1,13 +1,12 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
-import QtQuick.Dialogs
 import QtQuick.Layouts
 
 ToolTip {
     id: tool_tip
 
-    signal accepted()
+    signal accepted
     property alias message: label.text
 
     width: 250
@@ -43,16 +42,16 @@ ToolTip {
                 text: qsTr("OK")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 onClicked: {
-                    tool_tip.accepted()
-                    tool_tip.close()
+                    tool_tip.accepted();
+                    tool_tip.close();
                 }
             }
         }
     }
 
     function show(parentSize) {
-        tool_tip.x = (parentSize.width - tool_tip.width) / 2
-        tool_tip.y = (parentSize.height - tool_tip.height) / 2
-        tool_tip.visible = true
+        tool_tip.x = (parentSize.width - tool_tip.width) / 2;
+        tool_tip.y = (parentSize.height - tool_tip.height) / 2;
+        tool_tip.visible = true;
     }
 }

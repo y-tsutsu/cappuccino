@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 
 Item {
     id: item
@@ -16,11 +15,11 @@ Item {
 
     onVisibleChanged: {
         if (item.visible) {
-            imodel.start_view()
+            imodel.start_view();
         }
     }
 
     function release() {
-        image_url = null
+        image_url = null;
     }
 }

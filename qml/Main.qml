@@ -71,9 +71,9 @@ ApplicationWindow {
             checked: true
             onTriggered: {
                 if (checked) {
-                    window.flags |= Qt.WindowStaysOnTopHint
+                    window.flags |= Qt.WindowStaysOnTopHint;
                 } else {
-                    window.flags &= ~Qt.WindowStaysOnTopHint
+                    window.flags &= ~Qt.WindowStaysOnTopHint;
                 }
             }
         }
@@ -86,7 +86,7 @@ ApplicationWindow {
         MenuItem {
             text: qsTr("CLEAR")
             onTriggered: {
-                message.show(Qt.size(window.width, window.height))
+                message.show(Qt.size(window.width, window.height));
             }
         }
 
@@ -94,9 +94,9 @@ ApplicationWindow {
             text: qsTr("EXIT")
             onTriggered: {
                 // QtのBugのようだが先にBindingを切らないとエラーになる
-                viewer.release()
-                window.release()
-                window.close()
+                viewer.release();
+                window.release();
+                window.close();
             }
         }
     }
@@ -112,55 +112,54 @@ ApplicationWindow {
 
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
-                menu.popup(mouse.x, mouse.y)
+                menu.popup(mouse.x, mouse.y);
             }
         }
 
         onPressAndHold: mouse => {
             if (mouse.source === Qt.MouseEventNotSynthesized) {
-                menu.popup(mouse.x, mouse.y)
+                menu.popup(mouse.x, mouse.y);
             }
         }
 
         onDoubleClicked: mouse => {
             if (mouse.button === Qt.LeftButton) {
-                window.showMinimized()
+                window.showMinimized();
             }
         }
 
         onPressed: mouse => {
             if (mouse.button === Qt.LeftButton) {
-                marea.pressPoint = Qt.point(mouse.x, mouse.y)
+                marea.pressPoint = Qt.point(mouse.x, mouse.y);
             }
         }
 
         onPositionChanged: mouse => {
-            if (marea.pressPoint !== marea.noneValue)
-            {
-                var gpos = mapToGlobal(mouse.x, mouse.y)
-                var mpos = Qt.point(gpos.x - marea.pressPoint.x, gpos.y - marea.pressPoint.y)
-                window.setX(mpos.x)
-                window.setY(mpos.y)
+            if (marea.pressPoint !== marea.noneValue) {
+                var gpos = mapToGlobal(mouse.x, mouse.y);
+                var mpos = Qt.point(gpos.x - marea.pressPoint.x, gpos.y - marea.pressPoint.y);
+                window.setX(mpos.x);
+                window.setY(mpos.y);
             }
         }
 
         onReleased: mouse => {
             if (mouse.button === Qt.LeftButton) {
-                marea.pressPoint = marea.noneValue
+                marea.pressPoint = marea.noneValue;
             }
         }
     }
 
     Component.onCompleted: {
-        const h = Screen.height / 5
-        width = h * 5 / 3
-        height = h
-        setX(Screen.width / 2 - width / 2)
-        setY(Screen.height / 2 - height / 2)
-        setVisible(true)
+        const h = Screen.height / 5;
+        width = h * 5 / 3;
+        height = h;
+        setX(Screen.width / 2 - width / 2);
+        setY(Screen.height / 2 - height / 2);
+        setVisible(true);
     }
 
     function release() {
-        window.isDownload = null
+        window.isDownload = null;
     }
 }

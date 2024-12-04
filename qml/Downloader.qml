@@ -15,7 +15,7 @@ Item {
 
         Label {
             id: label
-            text: qsTr("カプチーノを入れています．．．")
+            text: qsTr("I'm brewing a cappuccino...")
             font.family: "Yu Gothic UI"
             font.pointSize: 13
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -35,7 +35,7 @@ Item {
 
     onVisibleChanged: {
         if (item.visible) {
-            dmodel.start_download()
+            dmodel.start_download();
         }
     }
 }
