@@ -43,10 +43,20 @@ or
 $ pipenv run python cappuccino.py
 ```
 
-# Build by PyInstaller
+# Build
+
+## by PyInstaller
 
 ```console
-$ pipenv run build
+$ pipenv run build-pyins
 or
 $ pipenv run pyinstaller cappuccino.py --onefile --noconsole --clean --icon=cappuccino.ico --add-data ./cappuccino.ico;. --add-data ./qml/*;./qml/.
+```
+
+## by Nuitka
+
+```console
+$ pipenv run build-nuitka
+or
+$ python -m nuitka --standalone --onefile --windows-console-mode=disable --windows-icon-from-ico=cappuccino.ico --enable-plugin=pyside6 --include-qt-plugins=qml --include-data-dir=qml=qml --include-data-files=cappuccino.ico=cappuccino.ico cappuccino.py
 ```
